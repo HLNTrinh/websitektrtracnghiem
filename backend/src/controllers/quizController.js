@@ -1,0 +1,156 @@
+const Quiz = require('../models/Quiz');
+const Question = require('../models/Question');
+
+// Tạo đề thi
+exports.createQuiz = async (req, res) => {
+  try {
+    const { title, description, questions, duration, maxAttempts, startDate, endDate, showAnswerAfter, totalPoints, passingScore } = req.body;
+
+    if (!questions || questions.length === 0) {
+      return res.status(400).json({ message: 'Đề thi phải có tối thiểu 1 câu hỏi' });
+    }
+
+    // Verify questions exist
+    const questionIds = questions.map(q => q.questionId);
+    const foundQuestions = await Question.find({ _id: { $in: questionIds } });
+    if (foundQuestions.length !== questions.length) {
+      return res.status(400).json({ message: 'Một số câu hỏi không tồn tại' });
+    }
+
+    const quiz = new Quiz({
+      title,
+      description,
+      questions,
+      duration,
+      maxAttempts,
+      startDate,
+      endDate,
+      showAnswerAfter,
+      totalPoints,
+      passingScore,
+      createdBy: req.user.userId,
+    });
+
+    await quiz.save();
+    res.status(201).json({ message: 'Tạo đề thi thành công', data: quiz });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Lấy danh sách đề thi của giáo viên
+exports.getQuizzes = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+
+    const quizzes = await Quiz.find({ createdBy: req.user.userId })
+      .populate('createdBy', 'name email')
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 });
+
+    const total = await Quiz.countDocuments({ createdBy: req.user.userId });
+
+    res.json({
+      data: quizzes,
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Lấy chi tiết đề thi
+exports.getQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id)
+      .populate('createdBy', 'name email')
+      .populate('questions.questionId');
+
+    if (!quiz) {
+      return res.status(404).json({ message: 'Đề thi không tồn tại' });
+    }
+
+    res.json(quiz);
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Cập nhật đề thi
+exports.updateQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ message: 'Đề thi không tồn tại' });
+    }
+
+    if (quiz.createdBy.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa đề thi này' });
+    }
+
+    const { title, description, questions, duration, maxAttempts, startDate, endDate, showAnswerAfter, totalPoints, passingScore } = req.body;
+
+    Object.assign(quiz, {
+      title,
+      description,
+      questions,
+      duration,
+      maxAttempts,
+      startDate,
+      endDate,
+      showAnswerAfter,
+      totalPoints,
+      passingScore,
+    });
+
+    await quiz.save();
+    res.json({ message: 'Cập nhật đề thi thành công', data: quiz });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Xóa đề thi
+exports.deleteQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ message: 'Đề thi không tồn tại' });
+    }
+
+    if (quiz.createdBy.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Bạn không có quyền xóa đề thi này' });
+    }
+
+    await Quiz.deleteOne({ _id: req.params.id });
+    res.json({ message: 'Xóa đề thi thành công' });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};
+
+// Publish đề thi
+exports.publishQuiz = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({ message: 'Đề thi không tồn tại' });
+    }
+
+    if (quiz.createdBy.toString() !== req.user.userId) {
+      return res.status(403).json({ message: 'Bạn không có quyền công bố đề thi này' });
+    }
+
+    quiz.isPublished = true;
+    await quiz.save();
+    res.json({ message: 'Công bố đề thi thành công', data: quiz });
+  } catch (error) {
+    res.status(500).json({ message: 'Lỗi server', error: error.message });
+  }
+};

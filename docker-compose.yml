@@ -1,0 +1,111 @@
+version: '3.9'
+
+services:
+
+  # =====================================
+  # MongoDB
+  # =====================================
+  mongodb:
+    image: mongo:7.0
+
+    container_name: exam_mongodb
+
+    restart: unless-stopped
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: examdb
+
+    ports:
+      - "27017:27017"
+
+    volumes:
+      - mongo_data:/data/db
+
+    networks:
+      - exam_network
+
+
+  # =====================================
+  # Backend - NodeJS
+  # =====================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: exam_backend
+
+    restart: unless-stopped
+
+    env_file:
+      - ./backend/.env
+
+    environment:
+      NODE_ENV: development
+      PORT: 5001
+
+      MONGO_URI: mongodb://admin:secret@mongodb:27017/examdb?authSource=admin
+
+    ports:
+      - "5001:5001"
+
+    volumes:
+      - ./backend:/app
+      - backend_node_modules:/app/node_modules
+
+    depends_on:
+      - mongodb
+
+    networks:
+      - exam_network
+
+
+  # =====================================
+  # Frontend - React
+  # =====================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: exam_frontend
+
+    restart: unless-stopped
+
+    env_file:
+      - ./frontend/.env
+
+    environment:
+      REACT_APP_API_URL: http://localhost:5001/api
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+
+    depends_on:
+      - backend
+
+    networks:
+      - exam_network
+
+
+# =====================================
+# Volumes
+# =====================================
+volumes:
+  mongo_data:
+  backend_node_modules:
+  frontend_node_modules:
+
+
+# =====================================
+# Networks
+# =====================================
+networks:
+  exam_network:
+    driver: bridge
