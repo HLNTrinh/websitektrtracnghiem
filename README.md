@@ -14,6 +14,7 @@ myapp/
 │   │   └── index.html     # HTML Template
 │   ├── Dockerfile         # Frontend Docker Configuration
 │   └── package.json
+|   └── .env
 │
 ├── backend/               # Node.js + Express API
 │   ├── src/
@@ -23,7 +24,7 @@ myapp/
 │   │   └── server.js      # Express Server
 │   ├── Dockerfile         # Backend Docker Configuration
 │   ├── package.json
-│   └── .env.example
+│   └── .env
 │
 ├── docker-compose.yml     # Docker Compose Configuration
 ├── .gitignore
