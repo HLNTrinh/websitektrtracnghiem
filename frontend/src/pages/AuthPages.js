@@ -29,7 +29,7 @@ function LeftPanel() {
   }, []);
 
   return (
-    <section className="auth-left">
+     <section className="auth-left">
       <div className="blob blob-1" />
       <div className="blob blob-2" />
       <div className="auth-left-content">
@@ -39,9 +39,9 @@ function LeftPanel() {
           </div>
           <span className="brand-name">EduQuiz</span>
         </div>
-        <h1 className="auth-left-title">Nền tảng học tập thông minh</h1>
+        <h1 className="auth-left-title">Nền tảng học tập </h1>
         <p className="auth-left-desc">
-          Hệ thống quản lý thi và học tập trực tuyến dành cho học sinh, sinh viên và giáo viên chuyên nghiệp.
+          Hệ thống quản lý thi và học tập trực tuyến dành cho sinh viên và giáo viên chuyên nghiệp.
         </p>
         <div className="feature-list">
           <div className="feature-card">
@@ -128,7 +128,7 @@ export function LoginPage({ onLogin }) {
           </div>
 
           <div className="auth-form-header">
-            <h2 className="auth-form-title">Đăng nhập hệ thống</h2>
+            <h2 className="auth-form-title">Chào mừng bạn đến với EduQuiz</h2>
             <p className="auth-form-subtitle">Vui lòng nhập thông tin để tiếp tục học tập</p>
           </div>
 
