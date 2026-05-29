@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import '../styles/AuthPages.css';
+import { Link } from 'react-router-dom';
 const GoogleIcon = () => (
   <svg className="social-icon" viewBox="0 0 24 24">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -204,9 +205,15 @@ export function LoginPage({ onLogin }) {
               Chưa có tài khoản? <a href="/register" className="auth-link">Đăng ký ngay</a>
             </p>
             <div className="auth-footer-links">
-              <a href="#">Điều khoản</a>
-              <a href="#">Chính sách bảo mật</a>
-              <a href="#">Hỗ trợ</a>
+            <Link to="/terms">Điều khoản sử dụng</Link>
+
+  <Link to="/privacy">
+    Chính sách bảo mật
+  </Link>
+
+  <Link to="/support">
+    Hỗ trợ
+  </Link>
             </div>
           </div>
         </div>
@@ -350,9 +357,15 @@ export function RegisterPage({ onRegister }) {
               Đã có tài khoản? <a href="/login" className="auth-link">Đăng nhập</a>
             </p>
             <div className="auth-footer-links">
-              <a href="#">Điều khoản</a>
-              <a href="#">Chính sách bảo mật</a>
-              <a href="#">Hỗ trợ</a>
+         <Link to="/terms">Điều khoản sử dụng</Link>
+
+  <Link to="/privacy">
+    Chính sách bảo mật
+  </Link>
+
+  <Link to="/support">
+    Hỗ trợ
+  </Link>
             </div>
           </div>
         </div>
