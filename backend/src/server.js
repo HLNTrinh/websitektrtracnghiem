@@ -12,9 +12,11 @@ const app = express();
    Middleware
 ========================= */
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  credentials: true,
+}));
 app.use(morgan('dev'));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -22,20 +24,23 @@ app.use(express.urlencoded({ extended: true }));
    MongoDB Connection
 ========================= */
 const connectDB = async () => {
+  const mongoUri = process.env.MONGO_URI;
+
+  if (!mongoUri) {
+    console.error('❌ MONGO_URI is not defined in environment variables');
+    process.exit(1);
+  }
+
   try {
-    const mongoUri = process.env.MONGO_URI;
-
     await mongoose.connect(mongoUri);
-
+    const redactedUri = mongoUri.replace(/:\/\/[^@]+@/, '://***:***@');
     console.log('✅ Connected to MongoDB');
-    console.log(`📍 Database: ${mongoUri}`);
+    console.log(`📍 Database: ${redactedUri}`);
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
     process.exit(1);
   }
 };
-
-connectDB();
 
 /* =========================
    Root Route
@@ -48,9 +53,13 @@ app.get('/', (req, res) => {
    Health Check
 ========================= */
 app.get('/api/health', (req, res) => {
-  res.status(200).json({
-    success: true,
-    status: 'Backend is running!',
+  const dbState = mongoose.connection.readyState;
+  const isHealthy = dbState === 1;
+
+  res.status(isHealthy ? 200 : 503).json({
+    success: isHealthy,
+    status: isHealthy ? 'OK' : 'Database unavailable',
+    db: mongoose.STATES[dbState],
     timestamp: new Date(),
     environment: process.env.NODE_ENV || 'development',
   });
@@ -68,10 +77,7 @@ app.use('/api/quiz-attempts', require('./routes/quizAttemptRoutes'));
    404 Handler
 ========================= */
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found',
-  });
+  res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 /* =========================
@@ -79,25 +85,26 @@ app.use((req, res) => {
 ========================= */
 app.use((err, req, res, next) => {
   console.error(err.stack);
-
-  res.status(500).json({
+  res.status(err.status || 500).json({
     success: false,
     message: 'Something went wrong!',
-    error:
-      process.env.NODE_ENV === 'development'
-        ? err.message
-        : undefined,
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
   });
 });
 
 /* =========================
    Start Server
 ========================= */
-const PORT = process.env.PORT || 5001;
+const startServer = async () => {
+  await connectDB();
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📌 API URL: http://localhost:${PORT}/api`);
-});
+  const PORT = process.env.PORT || 8080;
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📌 API URL: http://localhost:${PORT}/api`);
+  });
+};
+
+startServer();
 
 module.exports = app;

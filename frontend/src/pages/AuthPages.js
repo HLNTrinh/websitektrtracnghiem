@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import '../styles/AuthPages.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
+// =====================
+// Icons
+// =====================
 const GoogleIcon = () => (
   <svg className="social-icon" viewBox="0 0 24 24">
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -9,12 +14,16 @@ const GoogleIcon = () => (
     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
   </svg>
 );
+
 const FacebookIcon = () => (
   <svg className="social-icon" viewBox="0 0 24 24" fill="#1877F2">
     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
   </svg>
 );
 
+// =====================
+// Left Panel (shared)
+// =====================
 function LeftPanel() {
   useEffect(() => {
     const cards = document.querySelectorAll(".feature-card");
@@ -30,7 +39,7 @@ function LeftPanel() {
   }, []);
 
   return (
-     <section className="auth-left">
+    <section className="auth-left">
       <div className="blob blob-1" />
       <div className="blob blob-2" />
       <div className="auth-left-content">
@@ -40,7 +49,7 @@ function LeftPanel() {
           </div>
           <span className="brand-name">EduQuiz</span>
         </div>
-        <h1 className="auth-left-title">Nền tảng học tập </h1>
+        <h1 className="auth-left-title">Nền tảng học tập</h1>
         <p className="auth-left-desc">
           Hệ thống quản lý thi và học tập trực tuyến dành cho sinh viên và giáo viên chuyên nghiệp.
         </p>
@@ -79,9 +88,25 @@ function LeftPanel() {
 }
 
 // =====================
+// Footer Links (shared)
+// =====================
+function AuthFooterLinks() {
+  return (
+    <div className="auth-footer-links">
+      <Link to="/terms">Điều khoản sử dụng</Link>
+      <Link to="/privacy">Chính sách bảo mật</Link>
+      <Link to="/support">Hỗ trợ</Link>
+    </div>
+  );
+}
+
+// =====================
 // LOGIN PAGE
 // =====================
-export function LoginPage({ onLogin }) {
+export function LoginPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -92,26 +117,18 @@ export function LoginPage({ onLogin }) {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    if (!email || !password) { setError("Vui lòng nhập email và mật khẩu."); return; }
+
+    if (!email || !password) {
+      setError("Vui lòng nhập email và mật khẩu.");
+      return;
+    }
+
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.message || "Email hoặc mật khẩu không chính xác."); return; }
-      if (rememberMe) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        sessionStorage.setItem("token", data.token);
-        sessionStorage.setItem("user", JSON.stringify(data.user));
-      }
-      onLogin && onLogin(data.user);
-    } catch {
-      setError("Không thể kết nối đến máy chủ. Vui lòng thử lại.");
+      await login(email, password, rememberMe);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message || "Email hoặc mật khẩu không chính xác.");
     } finally {
       setLoading(false);
     }
@@ -146,9 +163,13 @@ export function LoginPage({ onLogin }) {
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">mail</span>
                 <input
-                  id="login-email" type="email" placeholder="example@eduquiz.vn"
-                  value={email} onChange={(e) => setEmail(e.target.value)}
-                  className="auth-input" autoComplete="email"
+                  id="login-email"
+                  type="email"
+                  placeholder="example@eduquiz.vn"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="auth-input"
+                  autoComplete="email"
                 />
               </div>
             </div>
@@ -156,18 +177,25 @@ export function LoginPage({ onLogin }) {
             <div className="auth-field">
               <div className="auth-field-header">
                 <label className="auth-label" htmlFor="login-password">MẬT KHẨU</label>
-                <a href="/forgot-password" className="auth-forgot-link">Quên mật khẩu?</a>
+                <Link to="/forgot-password" className="auth-forgot-link">Quên mật khẩu?</Link>
               </div>
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">lock</span>
                 <input
-                  id="login-password" type={showPassword ? "text" : "password"}
-                  placeholder="••••••••" value={password}
+                  id="login-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="auth-input auth-input--password" autoComplete="current-password"
+                  className="auth-input auth-input--password"
+                  autoComplete="current-password"
                 />
-                <button type="button" className="auth-toggle-pw"
-                  onClick={() => setShowPassword(!showPassword)} aria-label="Hiện/ẩn mật khẩu">
+                <button
+                  type="button"
+                  className="auth-toggle-pw"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Hiện/ẩn mật khẩu"
+                >
                   <span className="material-symbols-outlined">
                     {showPassword ? "visibility_off" : "visibility"}
                   </span>
@@ -176,14 +204,19 @@ export function LoginPage({ onLogin }) {
             </div>
 
             <label className="auth-remember">
-              <input type="checkbox" checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
               Ghi nhớ đăng nhập
             </label>
 
-            <button type="submit"
+            <button
+              type="submit"
               className={`auth-btn-login ${loading ? "auth-btn-login--loading" : ""}`}
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
               {!loading && <span className="material-symbols-outlined">arrow_forward</span>}
             </button>
@@ -202,19 +235,10 @@ export function LoginPage({ onLogin }) {
 
           <div className="auth-footer">
             <p className="auth-footer-link">
-              Chưa có tài khoản? <a href="/register" className="auth-link">Đăng ký ngay</a>
+              Chưa có tài khoản?{" "}
+              <Link to="/register" className="auth-link">Đăng ký ngay</Link>
             </p>
-            <div className="auth-footer-links">
-            <Link to="/terms">Điều khoản sử dụng</Link>
-
-  <Link to="/privacy">
-    Chính sách bảo mật
-  </Link>
-
-  <Link to="/support">
-    Hỗ trợ
-  </Link>
-            </div>
+            <AuthFooterLinks />
           </div>
         </div>
       </section>
@@ -225,8 +249,16 @@ export function LoginPage({ onLogin }) {
 // =====================
 // REGISTER PAGE
 // =====================
-export function RegisterPage({ onRegister }) {
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", role: "student" });
+export function RegisterPage() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -236,29 +268,26 @@ export function RegisterPage({ onRegister }) {
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
+
     if (!form.name || !form.email || !form.password || !form.confirmPassword) {
-      setError("Vui lòng điền đầy đủ thông tin."); return;
+      setError("Vui lòng điền đầy đủ thông tin.");
+      return;
     }
     if (form.password !== form.confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp."); return;
+      setError("Mật khẩu xác nhận không khớp.");
+      return;
     }
     if (form.password.length < 6) {
-      setError("Mật khẩu phải có ít nhất 6 ký tự."); return;
+      setError("Mật khẩu phải có ít nhất 6 ký tự.");
+      return;
     }
+
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, email: form.email, password: form.password, role: form.role }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setError(data.message || "Đăng ký thất bại."); return; }
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      onRegister && onRegister(data.user);
-    } catch {
-      setError("Không thể kết nối đến máy chủ. Vui lòng thử lại.");
+      await register(form.name, form.email, form.password);
+      navigate("/login");
+    } catch (err) {
+      setError(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -291,8 +320,16 @@ export function RegisterPage({ onRegister }) {
               <label className="auth-label" htmlFor="reg-name">HỌ VÀ TÊN</label>
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">person</span>
-                <input id="reg-name" name="name" type="text" placeholder="Nguyễn Văn A"
-                  value={form.name} onChange={handleChange} className="auth-input" />
+                <input
+                  id="reg-name"
+                  name="name"
+                  type="text"
+                  placeholder="Nguyễn Văn A"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="auth-input"
+                  autoComplete="name"
+                />
               </div>
             </div>
 
@@ -300,20 +337,16 @@ export function RegisterPage({ onRegister }) {
               <label className="auth-label" htmlFor="reg-email">EMAIL</label>
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">mail</span>
-                <input id="reg-email" name="email" type="email" placeholder="example@eduquiz.vn"
-                  value={form.email} onChange={handleChange} className="auth-input" autoComplete="email" />
-              </div>
-            </div>
-
-            <div className="auth-field">
-              <label className="auth-label" htmlFor="reg-role">VAI TRÒ</label>
-              <div className="auth-field-row">
-                <span className="auth-field-icon material-symbols-outlined">school</span>
-                <select id="reg-role" name="role" value={form.role}
-                  onChange={handleChange} className="auth-input auth-select">
-                  <option value="student">Học sinh / Sinh viên</option>
-                  <option value="teacher">Giáo viên</option>
-                </select>
+                <input
+                  id="reg-email"
+                  name="email"
+                  type="email"
+                  placeholder="example@eduquiz.vn"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="auth-input"
+                  autoComplete="email"
+                />
               </div>
             </div>
 
@@ -321,12 +354,22 @@ export function RegisterPage({ onRegister }) {
               <label className="auth-label" htmlFor="reg-password">MẬT KHẨU</label>
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">lock</span>
-                <input id="reg-password" name="password"
-                  type={showPassword ? "text" : "password"} placeholder="Ít nhất 6 ký tự"
-                  value={form.password} onChange={handleChange}
-                  className="auth-input auth-input--password" />
-                <button type="button" className="auth-toggle-pw"
-                  onClick={() => setShowPassword(!showPassword)} aria-label="Hiện/ẩn mật khẩu">
+                <input
+                  id="reg-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ít nhất 6 ký tự"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="auth-input auth-input--password"
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  className="auth-toggle-pw"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Hiện/ẩn mật khẩu"
+                >
                   <span className="material-symbols-outlined">
                     {showPassword ? "visibility_off" : "visibility"}
                   </span>
@@ -338,15 +381,24 @@ export function RegisterPage({ onRegister }) {
               <label className="auth-label" htmlFor="reg-confirm">XÁC NHẬN MẬT KHẨU</label>
               <div className="auth-field-row">
                 <span className="auth-field-icon material-symbols-outlined">lock</span>
-                <input id="reg-confirm" name="confirmPassword"
-                  type={showPassword ? "text" : "password"} placeholder="Nhập lại mật khẩu"
-                  value={form.confirmPassword} onChange={handleChange} className="auth-input" />
+                <input
+                  id="reg-confirm"
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Nhập lại mật khẩu"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  className="auth-input"
+                  autoComplete="new-password"
+                />
               </div>
             </div>
 
-            <button type="submit"
+            <button
+              type="submit"
               className={`auth-btn-login ${loading ? "auth-btn-login--loading" : ""}`}
-              disabled={loading}>
+              disabled={loading}
+            >
               {loading ? "Đang đăng ký..." : "Đăng ký"}
               {!loading && <span className="material-symbols-outlined">arrow_forward</span>}
             </button>
@@ -354,19 +406,10 @@ export function RegisterPage({ onRegister }) {
 
           <div className="auth-footer">
             <p className="auth-footer-link">
-              Đã có tài khoản? <a href="/login" className="auth-link">Đăng nhập</a>
+              Đã có tài khoản?{" "}
+              <Link to="/login" className="auth-link">Đăng nhập</Link>
             </p>
-            <div className="auth-footer-links">
-         <Link to="/terms">Điều khoản sử dụng</Link>
-
-  <Link to="/privacy">
-    Chính sách bảo mật
-  </Link>
-
-  <Link to="/support">
-    Hỗ trợ
-  </Link>
-            </div>
+            <AuthFooterLinks />
           </div>
         </div>
       </section>
