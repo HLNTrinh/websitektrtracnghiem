@@ -42,10 +42,6 @@ const questionSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true }
 );
@@ -53,11 +49,11 @@ const questionSchema = new mongoose.Schema(
 // Validate: phải có 4 đáp án, 1 đáp án đúng
 questionSchema.pre('save', function (next) {
   if (this.options.length !== 4) {
-    throw new Error('Câu hỏi phải có đúng 4 đáp án');
+    return next(new Error('Câu hỏi phải có đúng 4 đáp án'));
   }
   const correctCount = this.options.filter(opt => opt.isCorrect).length;
   if (correctCount !== 1) {
-    throw new Error('Phải có đúng 1 đáp án đúng');
+    return next(new Error('Phải có đúng 1 đáp án đúng'));
   }
   next();
 });

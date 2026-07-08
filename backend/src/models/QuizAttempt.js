@@ -69,15 +69,10 @@ const quizAttemptSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
-    },
   },
   { timestamps: true }
 );
 
-// Index để query nhanh
 quizAttemptSchema.index({ studentId: 1, quizId: 1 });
 quizAttemptSchema.index({ quizId: 1 });
 
