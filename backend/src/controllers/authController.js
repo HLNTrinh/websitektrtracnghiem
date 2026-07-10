@@ -31,6 +31,7 @@ const register = async (req, res) => {
 
     res.status(201).json({ message: 'Đăng ký thành công', user: safeUser });
   } catch (error) {
+   // console.error("Register error:", error);//thêm
     res.status(500).json({ message: error.message });
   }
 };

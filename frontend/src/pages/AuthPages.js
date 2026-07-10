@@ -128,7 +128,7 @@ export function LoginPage() {
       await login(email, password, rememberMe);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Email hoặc mật khẩu không chính xác.");
+      setError(err.message || "Đăng nhập thất bại. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
