@@ -63,7 +63,9 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     authService.logout();
     setUser(null);
-    window.location.href = '/login';
+    const currentPath = window.location.pathname;
+    const redirectPath = currentPath.startsWith('/admin') ? '/admin' : '/login';
+    window.location.href = redirectPath;
   };
 
   return (

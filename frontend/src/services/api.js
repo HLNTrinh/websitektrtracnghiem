@@ -24,9 +24,12 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const message = error.response?.data?.message || 'Đã có lỗi xảy ra';
+    const pathname = window.location.pathname;
+    const isAdminRoute = pathname.startsWith('/admin');
+    const isPublicRoute = ['/login', '/register', '/admin'].includes(pathname);
 
-    // Token hết hạn hoặc không hợp lệ → tự động logout
-    if (error.response?.status === 401) {
+    // Token hết hạn hoặc không hợp lệ → chỉ tự động logout cho các route không phải admin/public
+    if (error.response?.status === 401 && !isAdminRoute && !isPublicRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';

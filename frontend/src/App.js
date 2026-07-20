@@ -7,6 +7,11 @@ import { TeacherDashboardPage } from './pages/TeacherDashboardPage';
 import { TakeQuizPage } from './pages/TakeQuizPage';
 import './App.css';
 
+// Thêm trang admin
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminUserManagementPage from "./pages/AdminUserManagementPage";
+
 function AppRoutes() {
   const { user, loading, logout } = useAuth();
 
@@ -27,35 +32,65 @@ function AppRoutes() {
       )}
 
       <Routes>
+
+        {/* ===== Public Route cho Admin ===== */}
+        <Route path="/admin" element={<AdminLoginPage />} />
+        {/* Test giao diện trang adminbroadbash trước nào có backend với CSDL thì bỏ ra */}
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />}/>
+        {/* Test giao diện Quản lý người dùng */}
+        <Route
+          path="/admin/users"
+          element={<AdminUserManagementPage />}
+        />
         {!user ? (
           <>
+            {/* Đăng nhập Teacher / Student */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+
+            {/* Mặc định */}
             <Route path="*" element={<Navigate to="/login" />} />
           </>
         ) : (
           <>
-            {user.role === 'student' && (
+            {/* ===== Student ===== */}
+            {user.role === "student" && (
               <>
-                <Route path="/student/dashboard" element={<StudentDashboardPage />} />
-                <Route path="/quiz/:quizId" element={<TakeQuizPage />} />
+                <Route
+                  path="/student/dashboard"
+                  element={<StudentDashboardPage />}
+                />
+                <Route
+                  path="/quiz/:quizId"
+                  element={<TakeQuizPage />}
+                />
               </>
             )}
 
-            {user.role === 'teacher' && (
-              <Route path="/teacher/dashboard" element={<TeacherDashboardPage />} />
+            {/* ===== Teacher ===== */}
+            {user.role === "teacher" && (
+              <Route
+                path="/teacher/dashboard"
+                element={<TeacherDashboardPage />}
+              />
             )}
 
-            {user.role === 'admin' && (
-              <Route path="/admin/dashboard" element={<TeacherDashboardPage />} />
+            {/* ===== Admin ===== */}
+            {user.role === "admin" && (
+              <Route
+                path="/admin/dashboard"
+                element={<AdminDashboardPage />}
+              />
             )}
 
+            {/* Route mặc định sau khi đăng nhập */}
             <Route
               path="*"
               element={<Navigate to={`/${user.role}/dashboard`} />}
             />
           </>
         )}
+
       </Routes>
     </div>
   );
