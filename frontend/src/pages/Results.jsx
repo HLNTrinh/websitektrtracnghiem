@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom'
-import Sidebar from '../components/Sidebar.jsx'
 import './Results.css'
 
 const history = [
@@ -11,181 +10,178 @@ const history = [
 
 export default function Results() {
   return (
-    <div className="page-shell">
-      <Sidebar />
-      <main className="results-main">
-        <nav className="top-nav">
-          <div className="top-nav-brand">EduQuiz</div>
-          <div className="top-nav-links">
-            <NavLink to="/" className="top-nav-link">Tổng quan</NavLink>
-            <NavLink to="/bai-thi" className="top-nav-link">Bài thi</NavLink>
-            <NavLink to="/ket-qua" className="top-nav-link active">Kết quả</NavLink>
-          </div>
-          <div className="top-nav-right">
-            <div className="search-box small">
-              <SearchIcon />
-              <input placeholder="Tìm kiếm kết quả..." />
-            </div>
-            <button className="icon-btn"><BellIcon /></button>
-            <img className="nav-avatar" src="https://i.pravatar.cc/64?img=14" alt="" />
-          </div>
-        </nav>
-
-        <div className="results-body">
-          <div className="results-head">
-            <div>
-              <h1>Kết quả bài thi mới nhất</h1>
-              <p>Chúc mừng! Bạn vừa hoàn thành bài kiểm tra Toán Giải Tích.</p>
-            </div>
-            <span className="pill-success">✓ Hoàn thành xuất sắc</span>
-          </div>
-
-          <section className="score-grid">
-            <div className="score-card">
-              <span className="score-label">ĐIỂM SỐ CỦA BẠN</span>
-              <div className="score-value">9.5<span>/10</span></div>
-              <div className="score-actions">
-                <button className="btn-white"><EyeIcon /> Xem lại bài làm</button>
-                <button className="btn-ghost-light"><ShareIcon /> Chia sẻ</button>
-              </div>
-              <div className="score-blob" />
-            </div>
-
-            <div className="score-side">
-              <div className="side-stat">
-                <span className="side-label">Thời gian làm bài</span>
-                <span className="side-value">24:15 <small>/ 45p</small></span>
-                <span className="side-icon"><TimerIcon /></span>
-              </div>
-              <div className="side-stat">
-                <span className="side-label">Tỷ lệ chính xác</span>
-                <span className="side-value">95%</span>
-                <span className="side-icon good"><CheckIcon /></span>
-              </div>
-            </div>
-          </section>
-
-          <section className="card detail-card">
-            <div className="detail-head">
-              <h3>Chi tiết câu hỏi</h3>
-              <div className="detail-legend">
-                <span><i className="dot good" /> 38 Đúng</span>
-                <span><i className="dot bad" /> 2 Sai</span>
-                <span><i className="dot neutral" /> 0 Bỏ qua</span>
-              </div>
-            </div>
-            <div className="detail-bar">
-              <div className="detail-bar-good" style={{ width: '95%' }} />
-              <div className="detail-bar-bad" style={{ width: '5%' }} />
-            </div>
-          </section>
-
-          <h2 className="section-title">Thống kê cá nhân</h2>
-          <section className="stat-two-grid">
-            <div className="card">
-              <div className="card-head">
-                <h3>Tiến độ điểm số</h3>
-                <span className="trend-up">↗ +12%</span>
-              </div>
-              <p className="muted-small">Trung bình 30 ngày qua</p>
-              <div className="mini-bars">
-                {[38, 46, 34, 58, 66, 78].map((h, i) => (
-                  <div key={i} className={'mini-bar-col' + (i === 5 ? ' active' : '')}>
-                    <div className="mini-bar" style={{ height: h + '%' }} />
-                  </div>
-                ))}
-              </div>
-              <div className="mini-bar-labels">
-                {['T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((m) => <span key={m}>{m}</span>)}
-              </div>
-            </div>
-
-            <div className="card">
-              <h3>Kỹ năng theo môn học</h3>
-              <p className="muted-small">Đánh giá dựa trên lịch sử làm bài</p>
-              <div className="radar-wrap">
-                <svg viewBox="0 0 200 200" width="220" height="220">
-                  {[1, 2, 3, 4].map((r) => (
-                    <polygon
-                      key={r}
-                      points={pentagonPoints(100, 100, 80 * (r / 4))}
-                      fill="none"
-                      stroke="#e7e9f2"
-                      strokeWidth="1"
-                    />
-                  ))}
-                  <polygon points={pentagonPoints(100, 100, 80)} fill="none" stroke="#e7e9f2" strokeWidth="1" />
-                  <polygon
-                    points={pentagonPoints(100, 100, 80, [0.9, 0.7, 0.6, 0.65, 0.85])}
-                    fill="rgba(29,78,216,0.22)"
-                    stroke="var(--color-primary)"
-                    strokeWidth="2"
-                  />
-                  {['Toán', 'Lý', 'Hóa', 'Anh', 'Văn'].map((label, i) => {
-                    const [x, y] = labelPoint(100, 100, 98, i)
-                    return <text key={label} x={x} y={y} fontSize="11" fill="#6b7180" textAnchor="middle">{label}</text>
-                  })}
-                </svg>
-              </div>
-            </div>
-          </section>
-
-          <section className="card history-card">
-            <div className="card-head">
-              <h3>Lịch sử làm bài</h3>
-              <div className="history-actions">
-                <button className="btn-outline small">⚲ Bộ lọc</button>
-                <button className="btn-outline small">⬇ Xuất PDF</button>
-              </div>
-            </div>
-
-            <table className="history-table">
-              <thead>
-                <tr>
-                  <th>Tên đề thi</th>
-                  <th>Môn học</th>
-                  <th>Ngày thi</th>
-                  <th>Điểm số</th>
-                </tr>
-              </thead>
-              <tbody>
-                {history.map((h) => (
-                  <tr key={h.name}>
-                    <td>
-                      <div className="h-name">{h.name}</div>
-                      <div className="h-meta">{h.meta}</div>
-                    </td>
-                    <td><span className={'subject-pill subject-' + slug(h.subject)}>{h.subject}</span></td>
-                    <td>{h.date}</td>
-                    <td className={h.tone === 'good' ? 'score-good' : 'score-bad'}>{h.score}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="table-footer">
-              <span>Hiển thị 4 trên 158 kết quả</span>
-              <div className="pager">
-                <button>‹</button>
-                <button>›</button>
-              </div>
-            </div>
-          </section>
-
-          <section className="cta-card">
-            <div className="cta-text">
-              <h3>Sẵn sàng nâng cao kiến thức?</h3>
-              <p>Dựa trên kết quả của bạn, chúng tôi đề xuất các bài tập bổ sung về phần 'Tích phân hàm ẩn'.</p>
-              <div className="cta-actions">
-                <button className="btn-primary">Luyện tập ngay</button>
-                <button className="btn-outline">Xem giáo trình</button>
-              </div>
-            </div>
-            <div className="cta-art" />
-          </section>
+    <main className="results-main">
+      <nav className="top-nav">
+        <div className="top-nav-brand">EduQuiz</div>
+        <div className="top-nav-links">
+          <NavLink to="/" className="top-nav-link">Tổng quan</NavLink>
+          <NavLink to="/bai-thi" className="top-nav-link">Bài thi</NavLink>
+          <NavLink to="/ket-qua" className="top-nav-link active">Kết quả</NavLink>
         </div>
-      </main>
-    </div>
+        <div className="top-nav-right">
+          <div className="search-box small">
+            <SearchIcon />
+            <input placeholder="Tìm kiếm kết quả..." />
+          </div>
+          <button className="icon-btn"><BellIcon /></button>
+          <img className="nav-avatar" src="https://i.pravatar.cc/64?img=14" alt="" />
+        </div>
+      </nav>
+
+      <div className="results-body">
+        <div className="results-head">
+          <div>
+            <h1>Kết quả bài thi mới nhất</h1>
+            <p>Chúc mừng! Bạn vừa hoàn thành bài kiểm tra Toán Giải Tích.</p>
+          </div>
+          <span className="pill-success">✓ Hoàn thành xuất sắc</span>
+        </div>
+
+        <section className="score-grid">
+          <div className="score-card">
+            <span className="score-label">ĐIỂM SỐ CỦA BẠN</span>
+            <div className="score-value">9.5<span>/10</span></div>
+            <div className="score-actions">
+              <button className="btn-white"><EyeIcon /> Xem lại bài làm</button>
+              <button className="btn-ghost-light"><ShareIcon /> Chia sẻ</button>
+            </div>
+            <div className="score-blob" />
+          </div>
+
+          <div className="score-side">
+            <div className="side-stat">
+              <span className="side-label">Thời gian làm bài</span>
+              <span className="side-value">24:15 <small>/ 45p</small></span>
+              <span className="side-icon"><TimerIcon /></span>
+            </div>
+            <div className="side-stat">
+              <span className="side-label">Tỷ lệ chính xác</span>
+              <span className="side-value">95%</span>
+              <span className="side-icon good"><CheckIcon /></span>
+            </div>
+          </div>
+        </section>
+
+        <section className="card detail-card">
+          <div className="detail-head">
+            <h3>Chi tiết câu hỏi</h3>
+            <div className="detail-legend">
+              <span><i className="dot good" /> 38 Đúng</span>
+              <span><i className="dot bad" /> 2 Sai</span>
+              <span><i className="dot neutral" /> 0 Bỏ qua</span>
+            </div>
+          </div>
+          <div className="detail-bar">
+            <div className="detail-bar-good" style={{ width: '95%' }} />
+            <div className="detail-bar-bad" style={{ width: '5%' }} />
+          </div>
+        </section>
+
+        <h2 className="section-title">Thống kê cá nhân</h2>
+        <section className="stat-two-grid">
+          <div className="card">
+            <div className="card-head">
+              <h3>Tiến độ điểm số</h3>
+              <span className="trend-up">↗ +12%</span>
+            </div>
+            <p className="muted-small">Trung bình 30 ngày qua</p>
+            <div className="mini-bars">
+              {[38, 46, 34, 58, 66, 78].map((h, i) => (
+                <div key={i} className={'mini-bar-col' + (i === 5 ? ' active' : '')}>
+                  <div className="mini-bar" style={{ height: h + '%' }} />
+                </div>
+              ))}
+            </div>
+            <div className="mini-bar-labels">
+              {['T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((m) => <span key={m}>{m}</span>)}
+            </div>
+          </div>
+
+          <div className="card">
+            <h3>Kỹ năng theo môn học</h3>
+            <p className="muted-small">Đánh giá dựa trên lịch sử làm bài</p>
+            <div className="radar-wrap">
+              <svg viewBox="0 0 200 200" width="220" height="220">
+                {[1, 2, 3, 4].map((r) => (
+                  <polygon
+                    key={r}
+                    points={pentagonPoints(100, 100, 80 * (r / 4))}
+                    fill="none"
+                    stroke="#e7e9f2"
+                    strokeWidth="1"
+                  />
+                ))}
+                <polygon points={pentagonPoints(100, 100, 80)} fill="none" stroke="#e7e9f2" strokeWidth="1" />
+                <polygon
+                  points={pentagonPoints(100, 100, 80, [0.9, 0.7, 0.6, 0.65, 0.85])}
+                  fill="rgba(29,78,216,0.22)"
+                  stroke="var(--color-primary)"
+                  strokeWidth="2"
+                />
+                {['Toán', 'Lý', 'Hóa', 'Anh', 'Văn'].map((label, i) => {
+                  const [x, y] = labelPoint(100, 100, 98, i)
+                  return <text key={label} x={x} y={y} fontSize="11" fill="#6b7180" textAnchor="middle">{label}</text>
+                })}
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section className="card history-card">
+          <div className="card-head">
+            <h3>Lịch sử làm bài</h3>
+            <div className="history-actions">
+              <button className="btn-outline small">⚲ Bộ lọc</button>
+              <button className="btn-outline small">⬇ Xuất PDF</button>
+            </div>
+          </div>
+
+          <table className="history-table">
+            <thead>
+              <tr>
+                <th>Tên đề thi</th>
+                <th>Môn học</th>
+                <th>Ngày thi</th>
+                <th>Điểm số</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((h) => (
+                <tr key={h.name}>
+                  <td>
+                    <div className="h-name">{h.name}</div>
+                    <div className="h-meta">{h.meta}</div>
+                  </td>
+                  <td><span className={'subject-pill subject-' + slug(h.subject)}>{h.subject}</span></td>
+                  <td>{h.date}</td>
+                  <td className={h.tone === 'good' ? 'score-good' : 'score-bad'}>{h.score}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="table-footer">
+            <span>Hiển thị 4 trên 158 kết quả</span>
+            <div className="pager">
+              <button>‹</button>
+              <button>›</button>
+            </div>
+          </div>
+        </section>
+
+        <section className="cta-card">
+          <div className="cta-text">
+            <h3>Sẵn sàng nâng cao kiến thức?</h3>
+            <p>Dựa trên kết quả của bạn, chúng tôi đề xuất các bài tập bổ sung về phần 'Tích phân hàm ẩn'.</p>
+            <div className="cta-actions">
+              <button className="btn-primary">Luyện tập ngay</button>
+              <button className="btn-outline">Xem giáo trình</button>
+            </div>
+          </div>
+          <div className="cta-art" />
+        </section>
+      </div>
+    </main>
   )
 }
 
