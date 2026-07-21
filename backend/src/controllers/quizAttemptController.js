@@ -14,7 +14,7 @@ exports.startQuizAttempt = async (req, res) => {
 
     // Kiểm tra số lần làm bài
     const attemptCount = await QuizAttempt.countDocuments({
-      studentId: req.user.userId,
+      studentId: req.user.id,
       quizId,
       status: { $in: ['in_progress', 'submitted'] },
     });
@@ -25,7 +25,7 @@ exports.startQuizAttempt = async (req, res) => {
 
     // Tạo attempt mới
     const attempt = new QuizAttempt({
-      studentId: req.user.userId,
+      studentId: req.user.id,
       quizId,
       answers: quiz.questions.map((q, index) => ({
         questionId: q.questionId._id,
@@ -170,7 +170,7 @@ exports.getAttemptResult = async (req, res) => {
       return res.status(404).json({ message: 'Lần làm bài không tồn tại' });
     }
 
-    if (attempt.studentId.toString() !== req.user.userId && attempt.quizId.createdBy.toString() !== req.user.userId) {
+    if (attempt.studentId.toString() !== req.user.id && attempt.quizId.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền xem kết quả này' });
     }
 
@@ -185,13 +185,13 @@ exports.getStudentAttempts = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
 
-    const attempts = await QuizAttempt.find({ studentId: req.user.userId })
+    const attempts = await QuizAttempt.find({ studentId: req.user.id })
       .populate('quizId', 'title')
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
 
-    const total = await QuizAttempt.countDocuments({ studentId: req.user.userId });
+    const total = await QuizAttempt.countDocuments({ studentId: req.user.id });
 
     res.json({
       data: attempts,
