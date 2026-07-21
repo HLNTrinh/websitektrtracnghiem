@@ -125,8 +125,9 @@ export function LoginPage() {
 
     setLoading(true);
     try {
-      await login(email, password, rememberMe);
-      navigate("/dashboard");
+      const data = await login(email, password, rememberMe);
+      const userRole = data?.user?.role || 'student';
+      navigate(`/${userRole}/dashboard`);
     } catch (err) {
       setError(err.message || "Email hoặc mật khẩu không chính xác.");
     } finally {
