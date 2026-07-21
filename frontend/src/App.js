@@ -72,6 +72,22 @@ function AppRoutes() {
                   element={<StudentDashboardPage />}
                 />
                 <Route
+                  path="/student/quizzes"
+                  element={<StudentDashboardPage />}
+                />
+                <Route
+                  path="/student/history"
+                  element={<StudentDashboardPage />}
+                />
+                <Route
+                  path="/student/profile"
+                  element={<StudentDashboardPage />}
+                />
+                <Route
+                  path="/student/settings"
+                  element={<StudentDashboardPage />}
+                />
+                <Route
                   path="/quiz/:quizId"
                   element={<TakeQuizPage />}
                 />

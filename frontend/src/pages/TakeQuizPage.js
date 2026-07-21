@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { quizAttemptService } from '../services/authService';
+import { quizAttemptService } from '../services/services';
 import { formatTime } from '../utils/formatTime';
 import '../styles/Quiz.css';
 
