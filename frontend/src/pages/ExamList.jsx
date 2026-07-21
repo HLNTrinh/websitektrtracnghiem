@@ -6,6 +6,7 @@ const tabs = ['Tất cả', 'Toán học', 'Ngữ văn', 'Tiếng Anh', 'Vật l
 
 const exams = [
   {
+    quizId: 'giai-tich-12-giua-ky',
     subject: 'Toán học',
     status: 'Đang diễn ra',
     statusType: 'live',
@@ -20,6 +21,7 @@ const exams = [
     duration: 45,
   },
   {
+    quizId: 'nghi-luan-van-hoc',
     subject: 'Ngữ văn',
     status: 'Đã bắt đầu',
     statusType: 'started',
@@ -34,6 +36,7 @@ const exams = [
     duration: 90,
   },
   {
+    quizId: 'english-proficiency-test',
     subject: 'Tiếng Anh',
     status: 'Đang diễn ra',
     statusType: 'live',
@@ -48,6 +51,7 @@ const exams = [
     duration: 60,
   },
   {
+    quizId: 'vat-ly-chuong-1',
     subject: 'Vật lý',
     status: 'Sắp diễn ra',
     statusType: 'upcoming',
@@ -62,6 +66,7 @@ const exams = [
     duration: 45,
   },
   {
+    quizId: 'hoa-huu-co-11',
     subject: 'Hóa học',
     status: 'Đã hoàn thành',
     statusType: 'done',
@@ -157,7 +162,7 @@ export default function ExamList() {
               disabled={e.ctaType === 'disabled'}
               onClick={() => {
                 if (e.ctaType === 'primary') setModalExam(e)
-                else if (e.cta === 'Tiếp tục làm bài') navigate('/lam-bai')
+                else if (e.cta === 'Tiếp tục làm bài') navigate(`/quiz/${e.quizId}`)
                 else if (e.cta === 'Xem lại kết quả') navigate('/ket-qua')
               }}
             >
@@ -179,7 +184,7 @@ export default function ExamList() {
         <ConfirmModal
           exam={modalExam}
           onClose={() => setModalExam(null)}
-          onStart={() => navigate('/lam-bai')}
+          onStart={() => navigate(`/quiz/${modalExam.quizId}`)}
         />
       )}
     </main>
