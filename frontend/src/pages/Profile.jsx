@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './Profile.css'
+import '../styles/Profile.css'
 
 export default function Profile() {
   const [emailNotif, setEmailNotif] = useState(true)

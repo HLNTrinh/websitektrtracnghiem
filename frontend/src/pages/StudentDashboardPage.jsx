@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Dashboard.css";
 
@@ -96,13 +96,7 @@ const chartMonths = [
 const chartValues = [55, 62, 58, 74, 68, 80];
 
 export default function StudentDashboardPage() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
+  const { user } = useAuth();
 
   return (
     <>

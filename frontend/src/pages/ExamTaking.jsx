@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { quizAttemptService } from "../services/services";
 import { useAuth } from "../context/AuthContext";
-import "./ExamTaking.css";
+import ".../styles/ExamTaking.css";
 
 const formatTime = (totalSeconds) => {
   const m = Math.floor(totalSeconds / 60);

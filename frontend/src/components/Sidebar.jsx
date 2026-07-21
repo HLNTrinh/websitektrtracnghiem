@@ -10,7 +10,6 @@ export default function Sidebar() {
 
             <h2 className="logo">EduQuiz</h2>
 
-            {/* Thông tin người dùng */}
             <div className="sidebar-user">
                 <img
                     src={user?.avatar || "https://i.pravatar.cc/80?img=12"}
