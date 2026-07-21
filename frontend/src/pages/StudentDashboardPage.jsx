@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import "../styles/Dashboard.css";
@@ -84,26 +84,53 @@ const recentResults = [
   },
 ];
 
-const chartMonths = [
-  "Tháng 1",
-  "Tháng 2",
-  "Tháng 3",
-  "Tháng 4",
-  "Tháng 5",
-  "Tháng 6",
-];
-// sample heights (%) for the mini bar/line chart placeholder
+const chartMonths = ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6"];
 const chartValues = [55, 62, 58, 74, 68, 80];
 
 export default function StudentDashboardPage() {
   const { user } = useAuth();
+  const [currentHour, setCurrentHour] = useState(new Date().getHours());
+
+  // Tối ưu greeting bằng useMemo
+  const greeting = useMemo(() => {
+    let text = "";
+    let emoji = "👋";
+
+    if (currentHour >= 5 && currentHour < 12) {
+      text = "Chào buổi sáng";
+      emoji = "🌅";
+    } else if (currentHour >= 12 && currentHour < 15) {
+      text = "Chào buổi trưa";
+      emoji = "☀️";
+    } else if (currentHour >= 15 && currentHour < 18) {
+      text = "Chào buổi chiều";
+      emoji = "🌤️";
+    } else {
+      text = "Chào buổi tối";
+      emoji = "🌙";
+    }
+
+    return `${text}, ${user?.name || "Học sinh"}! ${emoji}`;
+  }, [currentHour, user?.name]);
+
+  // Cập nhật giờ hiện tại
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getHours();
+      if (now !== currentHour) {
+        setCurrentHour(now);
+      }
+    }, 60000); // Kiểm tra mỗi phút
+
+    return () => clearInterval(interval);
+  }, [currentHour]);
 
   return (
     <>
       {/* HEADER */}
       <header className="dash-header">
         <div>
-          <h1>Chào buổi sáng, {user?.name || "Học sinh"}! 👋</h1>
+          <h1>{greeting}</h1>
           <p>Bạn có 3 bài thi cần hoàn thành trong tuần này.</p>
         </div>
 
@@ -188,7 +215,6 @@ export default function StudentDashboardPage() {
           <div className="card">
             <div className="card-head">
               <h3>Bài thi sắp đến hạn</h3>
-
               <Link to="/student/exams" className="view-all">
                 Xem tất cả
               </Link>
@@ -204,7 +230,6 @@ export default function StudentDashboardPage() {
 
                   <div className="exam-info">
                     <div className="exam-title">{e.title}</div>
-
                     <div className="exam-meta">
                       🕒 {e.time} &nbsp;&nbsp; 📄 {e.questions}
                     </div>
@@ -281,7 +306,6 @@ export default function StudentDashboardPage() {
           {/* Challenge */}
           <div className="challenge-card">
             <span className="eyebrow">THỬ THÁCH TUẦN</span>
-
             <p>Hoàn thành 5 bài thi trắc nghiệm để nhận 100 điểm thưởng!</p>
 
             <div className="progress-track">
