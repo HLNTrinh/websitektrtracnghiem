@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../components/admin/AdminLayout';
 import '../styles/AdminUserManagement.css';
 import { 
   Search, 
@@ -367,314 +368,212 @@ export default function AdminUserManagementPage() {
   };
 
   return (
-    <div className="admin-app-wrapper">
-      {/* Sidebar navigation */}
-      <aside className={`admin-sidebar ${isMobileSidebarOpen ? 'mobile-open' : ''}`}>
-        <div>
-          <div className="sidebar-brand">
-            <div className="brand-icon-box">
-              <GraduationCap size={22} strokeWidth={2.5} />
+    <AdminLayout pageTitle="Quản lý người dùng" pageSubtitle="Xem, tìm kiếm và quản lý phân quyền cho tất cả thành viên trong hệ thống.">
+      {/* Header section with Title and CTA */}
+      <div className="page-intro-section">
+        <button className="add-user-primary-btn" onClick={() => { resetForm(); setIsAddModalOpen(true); }}>
+          <UserPlus size={18} />
+          <span>Thêm người dùng mới</span>
+        </button>
+      </div>
+
+      {/* Filters & Statistics Dashboard Block */}
+      <div className="dashboard-top-grid">
+        <div className="filters-container-card">
+          <div className="filters-row">
+            <div className="filter-group search-detail">
+              <label className="filter-label">Tìm kiếm chi tiết</label>
+              <div className="filter-input-wrapper">
+                <Search className="filter-search-icon" />
+                <input 
+                  type="text" 
+                  placeholder="Tên, email hoặc ID..." 
+                  className="filter-text-input"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </div>
             </div>
-            <div className="brand-text-container">
-              <h2>EduQuiz</h2>
-              <span>Hệ thống quản lý thi</span>
+
+            <div className="filter-group">
+              <label className="filter-label">Vai trò</label>
+              <select 
+                className="filter-select"
+                value={roleFilter}
+                onChange={(e) => {
+                  setRoleFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option>Tất cả vai trò</option>
+                <option>Quản trị viên</option>
+                <option>Giáo viên</option>
+                <option>Học sinh</option>
+              </select>
             </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Trạng thái</label>
+              <select 
+                className="filter-select"
+                value={statusFilter}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
+              >
+                <option>Tất cả trạng thái</option>
+                <option>Hoạt động</option>
+                <option>Đã khóa</option>
+              </select>
+            </div>
+
+            {(searchQuery || roleFilter !== 'Tất cả vai trò' || statusFilter !== 'Tất cả trạng thái') && (
+              <button 
+                className="clear-filters-btn" 
+                title="Đặt lại bộ lọc"
+                onClick={clearAllFilters}
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
-          <nav className="sidebar-nav">
-            <button className="nav-link">
-              <BookOpen size={18} />
-              <span>Tổng quan</span>
-            </button>
-            <button className="nav-link active">
-              <Users size={18} />
-              <span>Quản lý người dùng</span>
-            </button>
-            <button className="nav-link">
-              <Layers size={18} />
-              <span>Môn học</span>
-            </button>
-            <button className="nav-link">
-              <GraduationCap size={18} />
-              <span>Lớp học</span>
-            </button>
-            <button className="nav-link">
-              <Bell size={18} />
-              <span>Thông báo</span>
-            </button>
-          </nav>
         </div>
-        <div className="sidebar-footer">
-          <button className="nav-link">
-            <Settings size={18} />
-            <span>Cài đặt</span>
-          </button>
-          <button className="nav-link logout-btn" onClick={() => showToast('Bạn đã chọn Đăng xuất')}>
-            <LogOut size={18} />
-            <span>Đăng xuất</span>
-          </button>
+
+        {/* Side Blue Stat Card */}
+        <div className="stats-info-card">
+          <div>
+            <p className="stats-card-label">Tổng người dùng</p>
+            <h3 className="stats-card-value">{users.length}</h3>
+          </div>
+          <div className="stats-card-trend">
+            <ArrowUpRight size={13} />
+            <span>+12% so với tháng trước</span>
+          </div>
         </div>
-      </aside>
+      </div>
 
-      {/* Main Layout Area */}
-      <div className="admin-main-layout">
-        {/* Top Header App Bar */}
-        <header className="admin-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
-            <button 
-              className="icon-btn" 
-              style={{ display: 'none' }} /* Triggered via CSS media queries */
-              onClick={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-              id="sidebar-toggle-btn"
-            >
-              {isMobileSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-            <div className="header-search-wrapper">
-              <Search className="search-icon-left" size={18} />
-              <input 
-                type="text" 
-                placeholder="Tìm kiếm hệ thống..." 
-                className="header-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="header-actions">
-            <button className="icon-btn" onClick={() => showToast('Bạn không có thông báo mới')}>
-              <Bell size={18} />
-              <span className="badge-dot"></span>
-            </button>
-            <button className="icon-btn" onClick={() => showToast('Trung tâm trợ giúp')}>
-              <HelpCircle size={18} />
-            </button>
-            <div className="header-divider"></div>
-            <div className="header-profile-dropdown" onClick={() => showToast('Cài đặt tài khoản Quản trị')}>
-              <img 
-                src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=150&auto=format&fit=crop" 
-                alt="Admin Avatar" 
-                className="admin-avatar"
-              />
-              <div className="profile-info">
-                <p className="profile-name">Admin EduQuiz</p>
-                <p className="profile-role">Quản trị viên</p>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Canvas Body */}
-        <main className="admin-page-content">
-          {/* Header section with Title and CTA */}
-          <div className="page-intro-section">
-            <div className="page-title-area">
-              <h1>Quản lý người dùng</h1>
-              <p>Xem, tìm kiếm và quản lý phân quyền cho tất cả thành viên trong hệ thống.</p>
-            </div>
-            <button className="add-user-primary-btn" onClick={() => { resetForm(); setIsAddModalOpen(true); }}>
-              <UserPlus size={18} />
-              <span>Thêm người dùng mới</span>
-            </button>
-          </div>
-
-          {/* Filters & Statistics Dashboard Block */}
-          <div className="dashboard-top-grid">
-            <div className="filters-container-card">
-              <div className="filters-row">
-                <div className="filter-group search-detail">
-                  <label className="filter-label">Tìm kiếm chi tiết</label>
-                  <div className="filter-input-wrapper">
-                    <Search className="filter-search-icon" />
-                    <input 
-                      type="text" 
-                      placeholder="Tên, email hoặc ID..." 
-                      className="filter-text-input"
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setCurrentPage(1);
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <div className="filter-group">
-                  <label className="filter-label">Vai trò</label>
-                  <select 
-                    className="filter-select"
-                    value={roleFilter}
-                    onChange={(e) => {
-                      setRoleFilter(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <option>Tất cả vai trò</option>
-                    <option>Quản trị viên</option>
-                    <option>Giáo viên</option>
-                    <option>Học sinh</option>
-                  </select>
-                </div>
-
-                <div className="filter-group">
-                  <label className="filter-label">Trạng thái</label>
-                  <select 
-                    className="filter-select"
-                    value={statusFilter}
-                    onChange={(e) => {
-                      setStatusFilter(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <option>Tất cả trạng thái</option>
-                    <option>Hoạt động</option>
-                    <option>Đã khóa</option>
-                  </select>
-                </div>
-
-                {(searchQuery || roleFilter !== 'Tất cả vai trò' || statusFilter !== 'Tất cả trạng thái') && (
-                  <button 
-                    className="clear-filters-btn" 
-                    title="Đặt lại bộ lọc"
-                    onClick={clearAllFilters}
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Side Blue Stat Card */}
-            <div className="stats-info-card">
-              <div>
-                <p className="stats-card-label">Tổng người dùng</p>
-                <h3 className="stats-card-value">{users.length}</h3>
-              </div>
-              <div className="stats-card-trend">
-                <ArrowUpRight size={13} />
-                <span>+12% so với tháng trước</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Table Container Card */}
-          <div className="table-data-card">
-            <div className="table-responsive-container">
-              <table className="users-list-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Họ tên &amp; Email</th>
-                    <th>Vai trò</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
-                    <th style={{ textAlign: 'right' }}>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentUsers.length > 0 ? (
-                    currentUsers.map((user) => (
-                      <tr key={user.id}>
-                        <td className="user-id-cell">{user.id}</td>
-                        <td>
-                          <div className="user-profile-cell">
-                            <img src={user.avatar} alt={user.fullName} className="table-user-avatar" />
-                            <div className="user-profile-info">
-                              <p className="user-full-name">{user.fullName}</p>
-                              <p className="user-email">{user.email}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`badge-role ${
-                            user.role === 'Quản trị viên' ? 'admin' : 
-                            user.role === 'Giáo viên' ? 'teacher' : 'student'
-                          }`}>
-                            {user.role}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`status-indicator ${user.status === 'Hoạt động' ? 'active' : 'locked'}`}>
-                            <span className={`status-dot ${user.status === 'Hoạt động' ? 'active' : 'locked'}`}></span>
-                            {user.status}
-                          </span>
-                        </td>
-                        <td className="date-text">{user.createdDate}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <div className="action-buttons-group">
-                            <button 
-                              className="table-action-btn view" 
-                              title="Xem chi tiết"
-                              onClick={() => openDetailModal(user)}
-                            >
-                              <Eye size={16} />
-                            </button>
-                            <button 
-                              className="table-action-btn edit" 
-                              title="Chỉnh sửa"
-                              onClick={() => openEditModal(user)}
-                            >
-                              <Edit size={16} />
-                            </button>
-                            <button 
-                              className={`table-action-btn ${user.status === 'Hoạt động' ? 'lock' : 'unlock'}`} 
-                              title={user.status === 'Hoạt động' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
-                              onClick={() => toggleUserLock(user)}
-                            >
-                              {user.status === 'Hoạt động' ? <Lock size={16} /> : <Unlock size={16} />}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-light)' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                          <AlertCircle size={28} />
-                          <p style={{ margin: 0, fontWeight: 600 }}>Không tìm thấy người dùng nào phù hợp</p>
-                          <p style={{ margin: 0, fontSize: '13px' }}>Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+      {/* Table Container Card */}
+      <div className="table-data-card">
+        <div className="table-responsive-container">
+          <table className="users-list-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Họ tên & Email</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+                <th style={{ textAlign: 'right' }}>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentUsers.length > 0 ? (
+                currentUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td className="user-id-cell">{user.id}</td>
+                    <td>
+                      <div className="user-profile-cell">
+                        <img src={user.avatar} alt={user.fullName} className="table-user-avatar" />
+                        <div className="user-profile-info">
+                          <p className="user-full-name">{user.fullName}</p>
+                          <p className="user-email">{user.email}</p>
                         </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className={`badge-role ${
+                        user.role === 'Quản trị viên' ? 'admin' : 
+                        user.role === 'Giáo viên' ? 'teacher' : 'student'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </td>
+                    <td>
+                      <span className={`status-indicator ${user.status === 'Hoạt động' ? 'active' : 'locked'}`}>
+                        <span className={`status-dot ${user.status === 'Hoạt động' ? 'active' : 'locked'}`}></span>
+                        {user.status}
+                      </span>
+                    </td>
+                    <td className="date-text">{user.createdDate}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div className="action-buttons-group">
+                        <button 
+                          className="table-action-btn view" 
+                          title="Xem chi tiết"
+                          onClick={() => openDetailModal(user)}
+                        >
+                          <Eye size={16} />
+                        </button>
+                        <button 
+                          className="table-action-btn edit" 
+                          title="Chỉnh sửa"
+                          onClick={() => openEditModal(user)}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className={`table-action-btn ${user.status === 'Hoạt động' ? 'lock' : 'unlock'}`} 
+                          title={user.status === 'Hoạt động' ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
+                          onClick={() => toggleUserLock(user)}
+                        >
+                          {user.status === 'Hoạt động' ? <Lock size={16} /> : <Unlock size={16} />}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px 24px', color: 'var(--text-light)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      <AlertCircle size={28} />
+                      <p style={{ margin: 0, fontWeight: 600 }}>Không tìm thấy người dùng nào phù hợp</p>
+                      <p style={{ margin: 0, fontSize: '13px' }}>Hãy thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-            {/* Pagination Controls bar */}
-            <div className="pagination-section-bar">
-              <p className="pagination-stats">
-                Hiển thị <span>{totalItems === 0 ? 0 : indexOfFirstItem + 1} - {Math.min(indexOfLastItem, totalItems)}</span> trong số <span>{totalItems}</span> người dùng
-              </p>
-              <div className="pagination-buttons">
-                <button 
-                  className="page-arrow-btn" 
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                
-                {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pageNum) => (
-                  <button 
-                    key={pageNum}
-                    className={`page-num-btn ${currentPage === pageNum ? 'active' : ''}`}
-                    onClick={() => handlePageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
+        {/* Pagination Controls bar */}
+        <div className="pagination-section-bar">
+          <p className="pagination-stats">
+            Hiển thị <span>{totalItems === 0 ? 0 : indexOfFirstItem + 1} - {Math.min(indexOfLastItem, totalItems)}</span> trong số <span>{totalItems}</span> người dùng
+          </p>
+          <div className="pagination-buttons">
+            <button 
+              className="page-arrow-btn" 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pageNum) => (
+              <button 
+                key={pageNum}
+                className={`page-num-btn ${currentPage === pageNum ? 'active' : ''}`}
+                onClick={() => handlePageChange(pageNum)}
+              >
+                {pageNum}
+              </button>
+            ))}
 
-                <button 
-                  className="page-arrow-btn" 
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
+            <button 
+              className="page-arrow-btn" 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            >
+              <ChevronRight size={16} />
+            </button>
           </div>
-        </main>
+        </div>
       </div>
 
       {/* Add User Modal */}
@@ -937,6 +836,6 @@ export default function AdminUserManagementPage() {
           <span>{toast}</span>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }

@@ -109,6 +109,11 @@
   letter-spacing: -0.5px;
 }
 
+.eduquiz-logo-icon {
+  font-size: 22px;
+  color: var(--color-primary);
+}
+
 .eduquiz-logo-dot {
   width: 8px;
   height: 8px;

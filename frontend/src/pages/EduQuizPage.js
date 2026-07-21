@@ -442,6 +442,7 @@ export default function EduQuizPage() {
       <header className="eduquiz-header">
         <div className="eduquiz-container eduquiz-header-container">
           <a href="#" className="eduquiz-logo">
+            <FaGraduationCap className="eduquiz-logo-icon" />
             EduQuiz <span className="eduquiz-logo-dot"></span>
           </a>
           <ul className="eduquiz-nav">
@@ -493,7 +494,7 @@ export default function EduQuizPage() {
           </ul>
           <div className="eduquiz-auth-btns">
             <button className="btn btn-text" onClick={() => navigate('/login')}>Đăng nhập</button>
-            <button className="btn btn-primary" onClick={scrollToPlayground}>Bắt đầu ngay</button>
+            <button className="btn btn-primary" onClick={scrollToPlayground}>Dùng thử ngay</button>
           </div>
         </div>
       </header>
@@ -505,7 +506,8 @@ export default function EduQuizPage() {
         <div className="eduquiz-container hero-grid">
           <div className="hero-content">
             <h1 className="hero-title">
-              Nền tảng thi trắc nghiệm<br />
+              Nền tảng thi <br />
+              trắc nghiệm <br />
               <span>trực tuyến</span> thông minh
             </h1>
             <p className="hero-description">
@@ -513,7 +515,7 @@ export default function EduQuizPage() {
             </p>
             <div className="hero-actions">
               <button className="btn btn-primary btn-large" onClick={scrollToPlayground}>
-                Bắt đầu ngay <FaArrowRight />
+                Dùng thử ngay <FaArrowRight />
               </button>
               <button className="btn btn-outline btn-large" onClick={scrollToPlayground}>
                 <FaPlay style={{ fontSize: '12px' }} /> Xem demo
@@ -1048,7 +1050,7 @@ export default function EduQuizPage() {
                       type="submit" 
                       className="btn btn-primary btn-large"
                     >
-                      Lưu &amp; Bắt đầu làm bài thi mẫu <FaPlay style={{ fontSize: '10px' }} />
+                      Lưu và Bắt đầu làm bài thi mẫu <FaPlay style={{ fontSize: '10px' }} />
                     </button>
                   </div>
                 </form>
@@ -1077,7 +1079,7 @@ export default function EduQuizPage() {
                   Quản lý toàn bộ hệ thống, phân quyền người dùng và kiểm soát dữ liệu vĩ mô của cơ sở giáo dục.
                 </p>
                 <ul className="role-list">
-                  <li className="role-list-item"><FaCheckCircle /> Quản lý tài khoản &amp; lớp học</li>
+                  <li className="role-list-item"><FaCheckCircle /> Quản lý tài khoản và lớp học</li>
                   <li className="role-list-item"><FaCheckCircle /> Cấu hình hệ thống linh hoạt</li>
                   <li className="role-list-item"><FaCheckCircle /> Báo cáo thống kê tổng hợp</li>
                 </ul>
@@ -1178,7 +1180,7 @@ export default function EduQuizPage() {
         <div className="eduquiz-container testimonials-grid">
           <div className="testimonials-info">
             <span className="section-tag">Đánh giá</span>
-            <h2 className="section-title" style={{ marginBottom: '20px' }}>Được tin dùng bởi hơn 10,000+ giáo viên &amp; học sinh</h2>
+            <h2 className="section-title" style={{ marginBottom: '20px' }}>Được tin dùng bởi hơn 10,000+ giáo viên và học sinh</h2>
             <div className="facepile-wrapper">
               <div className="facepile">
                 <img className="face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2HHiuNfiDktFGGxnvs9ew2p1vixaBRXi-pepuXfFJC09ZjTdjQccX0OZ2lLhp2IQRM12JkVqw1Bik7345CkcabbaZ1jDQxR0NiKrWu7ca4WMzfLTxYbFbJnwWqBzFXKF3v_qwBYwRdIaynuVzOFtQXKQR6q3uVkQVSZilZs2RZhXIagU4u6Ojjv8ybp_wcvlor64M2ngcaeb9K7yynpiB3iIt3rEXGu31JS0scx58l8gPK5KCtOehpjUuFPM8qNQKaRty4Sn7Qw48" alt="User 1" referrerPolicy="no-referrer" />
@@ -1267,21 +1269,21 @@ export default function EduQuizPage() {
             <div className="contact-info-list">
               <div className="contact-info-item">
                 <FaMapMarkerAlt />
-                <span>Tòa nhà Innovation, Công viên phần mềm Quang Trung, Quận 12, TP. Hồ Chí Minh</span>
+                <span>Tòa nhà 123, Đường Phạm Ngũ Lão, Phường Trà Vinh, Tỉnh Vĩnh Long</span>
               </div>
               <div className="contact-info-item">
                 <FaPhone />
-                <span>1900 8198</span>
+                <span>0747 093 823</span>
               </div>
               <div className="contact-info-item">
                 <FaEnvelope />
-                <span>contact@eduquiz.vn</span>
+                <span>nhombaocaotvu@gmail.com</span>
               </div>
             </div>
           </div>
         </div>
         <div className="eduquiz-container footer-bottom">
-          <p>© 2024 EduQuiz. Bảo lưu mọi quyền.</p>
+          <p>© 2026 EduQuiz. Bảo lưu mọi quyền.</p>
           <div className="footer-bottom-links">
             <a href="#">Điều khoản sử dụng</a>
             <a href="#">Chính sách bảo mật</a>

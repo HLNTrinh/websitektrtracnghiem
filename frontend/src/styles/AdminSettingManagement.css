@@ -122,6 +122,10 @@
   margin: 16px 0;
 }
 
+.asm-settings-section {
+  margin-top: auto;
+}
+
 .asm-logout-item {
   display: flex;
   align-items: center;
@@ -134,7 +138,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: auto;
 }
 
 .asm-logout-item:hover {

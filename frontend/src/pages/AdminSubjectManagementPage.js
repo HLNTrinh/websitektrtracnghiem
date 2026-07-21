@@ -1,12 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import AdminLayout from '../components/admin/AdminLayout';
 import { 
   MdMenuBook, 
-  MdDashboard, 
-  MdGroup, 
-  MdSchool, 
-  MdNotifications, 
-  MdSettings, 
-  MdLogout, 
   MdSearch, 
   MdHelpOutline, 
   MdAddCircle, 
@@ -20,7 +15,7 @@ import {
   MdChevronLeft, 
   MdChevronRight, 
   MdClose,
-  MdMenu
+  MdSchool
 } from 'react-icons/md';
 import '../styles/AdminSubjectManagement.css';
 
@@ -40,7 +35,6 @@ export default function AdminSubjectManagementPage() {
   const [subjects, setSubjects] = useState(defaultSubjects);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDept, setSelectedDept] = useState('Tất cả khoa/ngành');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -208,7 +202,7 @@ export default function AdminSubjectManagementPage() {
   const deptCount = [...new Set(subjects.map(s => s.department))].length;
 
   return (
-    <div className="admin-layout">
+    <AdminLayout pageTitle="Quản lý môn học" pageSubtitle="Danh sách và quản lý các môn học hiện có trong hệ thống.">
       {/* Toast alert notifications */}
       {toast && (
         <div className="toast-container" id="toastContainer">
@@ -223,316 +217,218 @@ export default function AdminSubjectManagementPage() {
         </div>
       )}
 
-      {/* Sidebar Navigation */}
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} id="sidebar">
-        <div className="sidebar-logo-section">
-          <div className="logo-icon-box">
-            <MdMenuBook />
+      {/* Page Content Dashboard */}
+      <div className="page-view">
+        {/* Bento Stats Summary Layout */}
+        <div className="bento-stats" id="bentoStats">
+          <div className="stat-card">
+            <div className="stat-icon-wrapper blue">
+              <MdLibraryBooks />
+            </div>
+            <div className="stat-info">
+              <p>Tổng môn học</p>
+              <h3>{totalCount < 10 ? `0${totalCount}` : totalCount}</h3>
+            </div>
           </div>
-          <div className="logo-text-box">
-            <h2>EduQuiz</h2>
-            <p>Hệ thống quản lý thi</p>
+
+          <div className="stat-card">
+            <div className="stat-icon-wrapper green">
+              <MdCheckCircle />
+            </div>
+            <div className="stat-info">
+              <p>Đang hoạt động</p>
+              <h3>{activeCount < 10 ? `0${activeCount}` : activeCount}</h3>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon-wrapper orange">
+              <MdPending />
+            </div>
+            <div className="stat-info">
+              <p>Tạm dừng</p>
+              <h3>{pausedCount < 10 ? `0${pausedCount}` : pausedCount}</h3>
+            </div>
+          </div>
+
+          <div className="stat-card">
+            <div className="stat-icon-wrapper purple">
+              <MdSchool />
+            </div>
+            <div className="stat-info">
+              <p>Số khoa/ngành</p>
+              <h3>{deptCount < 10 ? `0${deptCount}` : deptCount}</h3>
+            </div>
           </div>
         </div>
 
-        <nav className="sidebar-nav">
-          <a className="nav-item">
-            <MdDashboard />
-            <span>Tổng quan</span>
-          </a>
-          <a className="nav-item">
-            <MdGroup />
-            <span>Quản lý người dùng</span>
-          </a>
-          <a className="nav-item active">
-            <MdMenuBook />
-            <span>Môn học</span>
-          </a>
-          <a className="nav-item">
-            <MdSchool />
-            <span>Lớp học</span>
-          </a>
-          <a className="nav-item">
-            <MdNotifications />
-            <span>Thông báo</span>
-          </a>
-        </nav>
-
-        <div className="sidebar-footer">
-          <a className="nav-item">
-            <MdSettings />
-            <span>Cài đặt</span>
-          </a>
-          <a className="nav-item nav-item-logout" onClick={() => showToast('Bạn đã đăng xuất khỏi hệ thống thành công!', 'info')}>
-            <MdLogout />
-            <span>Đăng xuất</span>
-          </a>
-        </div>
-      </aside>
-
-      {/* Main Workspace Frame */}
-      <div className="main-content">
-        {/* Top Header Appbar */}
-        <header className="top-header" id="topHeader">
-          <div className="header-left">
-            <button className="menu-toggle-btn" onClick={() => setSidebarOpen(!sidebarOpen)} title="Toggle menu">
-              <MdMenu />
-            </button>
-            <div className="header-search">
-              <MdSearch className="header-search-icon" />
-              <input type="text" placeholder="Tìm kiếm tài liệu, bài thi..." />
-            </div>
+        {/* Search Filters Card Wrapper */}
+        <div className="filters-container" id="filtersContainer">
+          <div className="filter-search-box">
+            <MdSearch className="filter-search-icon" />
+            <input 
+              type="text" 
+              placeholder="Tìm mã hoặc tên môn học..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
+          
+          <div className="filter-right">
+            <select 
+              className="custom-select" 
+              value={selectedDept}
+              onChange={(e) => setSelectedDept(e.target.value)}
+            >
+              {departments.map((dept, idx) => (
+                <option key={idx} value={dept}>{dept}</option>
+              ))}
+            </select>
 
-          <div className="header-right">
-            <button className="icon-btn" title="Thông báo">
-              <MdNotifications />
-              <span className="btn-badge"></span>
+            <button className="btn-secondary" onClick={() => showToast('Đã áp dụng các bộ lọc tìm kiếm!', 'info')}>
+              <MdFilterList className="btn-secondary-icon" />
+              <span>Lọc</span>
             </button>
-            <button className="icon-btn" title="Trợ giúp">
-              <MdHelpOutline />
-            </button>
-            <div className="header-divider"></div>
-            <div className="user-profile">
-              <div className="user-text">
-                <p className="user-name">Admin EduQuiz</p>
-                <p className="user-role">Quản trị viên</p>
-              </div>
-              <img 
-                className="user-avatar" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBFfsnJCftiwUuy-KBMtJbVMoTNagOenBRyimv4kVL914npmFlHbPFAYYjXCZZZmNyzc-HUAnWVZo5yaPsVRxlG16XLm9WCCxST6_45b3_BolwhQ4y7Ql_3pMNTfqANgdQPwFknDzlfriBprliC_mWiDbaeWyWm0q9MK0pdlzPgnHVyvSL12SKscF_mXtrPAW9bDdyVS9h61hWH-yp07dnzZpoWVzvJ4aZwoldyzatyr3WVL2XxCFtVdHAm1EIvbqLSKaXZRbFGn2g" 
-                alt="Admin Profile Headshot"
-              />
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content Dashboard */}
-        <div className="page-view">
-          {/* Breadcrumbs and Page Heading */}
-          <div className="breadcrumb">
-            <a className="breadcrumb-link">Dashboard</a>
-            <span className="breadcrumb-separator"><MdChevronRight /></span>
-            <span className="breadcrumb-current">Quản lý môn học</span>
-          </div>
-
-          <div className="page-title-row">
-            <div className="page-title-box">
-              <h1>Quản lý môn học</h1>
-              <p>Danh sách và quản lý các môn học hiện có trong hệ thống.</p>
-            </div>
+            
             <button className="btn-primary" onClick={openAddModal} id="btnAddSubject">
               <MdAddCircle className="btn-primary-icon" />
               <span>Thêm môn học mới</span>
             </button>
           </div>
+        </div>
 
-          {/* Bento Stats Summary Layout */}
-          <div className="bento-stats" id="bentoStats">
-            <div className="stat-card">
-              <div className="stat-icon-wrapper blue">
-                <MdLibraryBooks />
-              </div>
-              <div className="stat-info">
-                <p>Tổng môn học</p>
-                <h3>{totalCount < 10 ? `0${totalCount}` : totalCount}</h3>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon-wrapper green">
-                <MdCheckCircle />
-              </div>
-              <div className="stat-info">
-                <p>Đang hoạt động</p>
-                <h3>{activeCount < 10 ? `0${activeCount}` : activeCount}</h3>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon-wrapper orange">
-                <MdPending />
-              </div>
-              <div className="stat-info">
-                <p>Tạm dừng</p>
-                <h3>{pausedCount < 10 ? `0${pausedCount}` : pausedCount}</h3>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon-wrapper purple">
-                <MdSchool />
-              </div>
-              <div className="stat-info">
-                <p>Số khoa/ngành</p>
-                <h3>{deptCount < 10 ? `0${deptCount}` : deptCount}</h3>
-              </div>
-            </div>
-          </div>
-
-          {/* Search Filters Card Wrapper */}
-          <div className="filters-container" id="filtersContainer">
-            <div className="filter-search-box">
-              <MdSearch className="filter-search-icon" />
-              <input 
-                type="text" 
-                placeholder="Tìm mã hoặc tên môn học..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <div className="filter-right">
-              <select 
-                className="custom-select" 
-                value={selectedDept}
-                onChange={(e) => setSelectedDept(e.target.value)}
-              >
-                {departments.map((dept, idx) => (
-                  <option key={idx} value={dept}>{dept}</option>
-                ))}
-              </select>
-
-              <button className="btn-secondary" onClick={() => showToast('Đã áp dụng các bộ lọc tìm kiếm!', 'info')}>
-                <MdFilterList className="btn-secondary-icon" />
-                <span>Lọc</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Table Card Section */}
-          <div className="table-card" id="tableCard">
-            <div className="table-responsive">
-              <table className="subjects-table">
-                <thead>
-                  <tr>
-                    <th>Mã môn học</th>
-                    <th>Tên môn học</th>
-                    <th>Khoa/Ngành</th>
-                    <th>Số lượng đề thi</th>
-                    <th>Trạng thái</th>
-                    <th style={{ textAlign: 'right' }}>Hành động</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.length > 0 ? (
-                    currentItems.map((subject) => (
-                      <tr key={subject.id}>
-                        <td>
-                          <span className="subject-code-badge">{subject.code}</span>
-                        </td>
-                        <td>
-                          <div className="subject-name-cell">
-                            <span className="subject-name">{subject.name}</span>
-                            <span className="subject-update-time">Cập nhật: {subject.updatedAt}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className="dept-text">{subject.department}</span>
-                        </td>
-                        <td>
-                          <div className="exams-count-badge">
-                            <span className="exams-count-num">
-                              {subject.examsCount < 10 ? `0${subject.examsCount}` : subject.examsCount}
-                            </span>
-                            <span className="exams-set-label">Bộ đề</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`status-badge ${subject.status === 'Đang hoạt động' ? 'active' : 'paused'}`}>
-                            <span className="status-dot"></span>
-                            {subject.status}
+        {/* Table Card Section */}
+        <div className="table-card" id="tableCard">
+          <div className="table-responsive">
+            <table className="subjects-table">
+              <thead>
+                <tr>
+                  <th>Mã môn học</th>
+                  <th>Tên môn học</th>
+                  <th>Khoa/Ngành</th>
+                  <th>Số lượng đề thi</th>
+                  <th>Trạng thái</th>
+                  <th style={{ textAlign: 'right' }}>Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentItems.length > 0 ? (
+                  currentItems.map((subject) => (
+                    <tr key={subject.id}>
+                      <td>
+                        <span className="subject-code-badge">{subject.code}</span>
+                      </td>
+                      <td>
+                        <div className="subject-name-cell">
+                          <span className="subject-name">{subject.name}</span>
+                          <span className="subject-update-time">Cập nhật: {subject.updatedAt}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className="dept-text">{subject.department}</span>
+                      </td>
+                      <td>
+                        <div className="exams-count-badge">
+                          <span className="exams-count-num">
+                            {subject.examsCount < 10 ? `0${subject.examsCount}` : subject.examsCount}
                           </span>
-                        </td>
-                        <td>
-                          <div className="actions-cell-wrapper">
-                            <button 
-                              className="action-icon-btn view" 
-                              title="Xem chi tiết" 
-                              onClick={() => openViewModal(subject)}
-                            >
-                              <MdVisibility />
-                            </button>
-                            <button 
-                              className="action-icon-btn edit" 
-                              title="Chỉnh sửa" 
-                              onClick={() => openEditModal(subject)}
-                            >
-                              <MdEdit />
-                            </button>
-                            <button 
-                              className="action-icon-btn delete" 
-                              title="Xóa" 
-                              onClick={() => openDeleteModal(subject)}
-                            >
-                              <MdDelete />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                        Không tìm thấy môn học nào phù hợp với bộ lọc tìm kiếm!
+                          <span className="exams-set-label">Bộ đề</span>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`status-badge ${subject.status === 'Đang hoạt động' ? 'active' : 'paused'}`}>
+                          <span className="status-dot"></span>
+                          {subject.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="actions-cell-wrapper">
+                          <button 
+                            className="action-icon-btn view" 
+                            title="Xem chi tiết" 
+                            onClick={() => openViewModal(subject)}
+                          >
+                            <MdVisibility />
+                          </button>
+                          <button 
+                            className="action-icon-btn edit" 
+                            title="Chỉnh sửa" 
+                            onClick={() => openEditModal(subject)}
+                          >
+                            <MdEdit />
+                          </button>
+                          <button 
+                            className="action-icon-btn delete" 
+                            title="Xóa" 
+                            onClick={() => openDeleteModal(subject)}
+                          >
+                            <MdDelete />
+                          </button>
+                        </div>
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                      Không tìm thấy môn học nào phù hợp với bộ lọc tìm kiếm!
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
 
-            {/* Pagination Controls Footer */}
-            {totalItems > 0 && (
-              <div className="pagination-section">
-                <p className="pagination-text">
-                  Hiển thị <span className="pagination-highlight">{startIndex + 1} - {endIndex}</span> trên tổng số <span className="pagination-highlight">{totalItems}</span> môn học
-                </p>
-                <div className="pagination-controls">
-                  <button 
-                    className="pagination-nav-btn" 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                    title="Trang trước"
-                  >
-                    <MdChevronLeft />
-                  </button>
+          {/* Pagination Controls Footer */}
+          {totalItems > 0 && (
+            <div className="pagination-section">
+              <p className="pagination-text">
+                Hiển thị <span className="pagination-highlight">{startIndex + 1} - {endIndex}</span> trên tổng số <span className="pagination-highlight">{totalItems}</span> môn học
+              </p>
+              <div className="pagination-controls">
+                <button 
+                  className="pagination-nav-btn" 
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                  title="Trang trước"
+                >
+                  <MdChevronLeft />
+                </button>
 
-                  <div className="pagination-pages">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button 
-                        key={page} 
-                        className={`page-number-btn ${currentPage === page ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button 
-                    className="pagination-nav-btn" 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                    title="Trang sau"
-                  >
-                    <MdChevronRight />
-                  </button>
+                <div className="pagination-pages">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <button 
+                      key={page} 
+                      className={`page-number-btn ${currentPage === page ? 'active' : ''}`}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  ))}
                 </div>
-              </div>
-            )}
-          </div>
 
-          {/* Dynamic Bottom Box / Illustration */}
-          <div className="decorative-empty-state">
-            <div className="empty-icon-circle">
-              <MdSchool />
+                <button 
+                  className="pagination-nav-btn" 
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  title="Trang sau"
+                >
+                  <MdChevronRight />
+                </button>
+              </div>
             </div>
-            <h3>Tối ưu hóa quản lý đào tạo</h3>
-            <p>
-              Hệ thống giúp bạn dễ dàng tổ chức nội dung học tập và thi cử theo các chuyên mục khoa học, tăng cường hiệu suất quản lý cho bộ phận học vụ.
-            </p>
+          )}
+        </div>
+
+        {/* Dynamic Bottom Box / Illustration */}
+        <div className="decorative-empty-state">
+          <div className="empty-icon-circle">
+            <MdSchool />
           </div>
+          <h3>Tối ưu hóa quản lý đào tạo</h3>
+          <p>
+            Hệ thống giúp bạn dễ dàng tổ chức nội dung học tập và thi cử theo các chuyên mục khoa học, tăng cường hiệu suất quản lý cho bộ phận học vụ.
+          </p>
         </div>
       </div>
 
@@ -707,6 +603,6 @@ export default function AdminSubjectManagementPage() {
           </div>
         </div>
       )}
-    </div>
+    </AdminLayout>
   );
 }
