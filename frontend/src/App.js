@@ -79,21 +79,13 @@ function AppRoutes() {
               <Route path="/admin/subject" element={<AdminSubjectManagementPage />} />
               <Route path="/admin/subjects" element={<AdminSubjectManagementPage />} />
               <Route path="/admin/class" element={<AdminClassManagementPage />} />
-              <Route
-                path="/admin/notifications"
-                element={<AdminNotificationManagementPage />}
-              />
-              <Route
-                path="/admin/settings"
-                element={<AdminSettingManagementPage />}
-              />
+              <Route path="/admin/notifications" element={<AdminNotificationManagementPage />}/>
+              <Route path="/admin/settings"  element={<AdminSettingManagementPage />} />
             </>
           )}
 
           {/* Route mặc định sau khi đăng nhập */}
-          <Route
-            path="*"
-            element={<Navigate to={`/${user.role}/dashboard`} replace />}
+          <Route path="*" element={<Navigate to={`/${user.role}/dashboard`} replace />}
           />
         </>
       )}
