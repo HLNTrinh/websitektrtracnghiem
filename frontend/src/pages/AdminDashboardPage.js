@@ -148,28 +148,28 @@
                 </button>
                 <button 
                 className={`db-nav-item ${activeMenu === 'subjects' ? 'active' : ''}`}
-                onClick={() => { setActiveMenu('subjects'); setIsSidebarOpen(false); }}
+                onClick={() => { setActiveMenu('subjects'); setIsSidebarOpen(false);navigate("/admin/subject"); }}
                 >
                 <span className="db-nav-icon"><MdBook /></span>
                 <span>Môn học</span>
                 </button>
                 <button 
                 className={`db-nav-item ${activeMenu === 'classes' ? 'active' : ''}`}
-                onClick={() => { setActiveMenu('classes'); setIsSidebarOpen(false); }}
+                onClick={() => { setActiveMenu('classes'); setIsSidebarOpen(false);navigate("/admin/class"); }}
                 >
                 <span className="db-nav-icon"><MdClass /></span>
                 <span>Lớp học</span>
                 </button>
                 <button 
                 className={`db-nav-item ${activeMenu === 'notifications' ? 'active' : ''}`}
-                onClick={() => { setActiveMenu('notifications'); setIsSidebarOpen(false); }}
+                onClick={() => { setActiveMenu('notifications'); setIsSidebarOpen(false); navigate("/admin/notifications"); }}
                 >
                 <span className="db-nav-icon"><MdNotifications /></span>
                 <span>Thông báo</span>
                 </button>
                 <button 
                 className={`db-nav-item ${activeMenu === 'settings' ? 'active' : ''}`}
-                onClick={() => { setActiveMenu('settings'); setIsSidebarOpen(false); }}
+                onClick={() => { setActiveMenu('settings'); setIsSidebarOpen(false);navigate("/admin/settings"); }}
                 >
                 <span className="db-nav-icon"><MdSettings /></span>
                 <span>Cài đặt</span>

@@ -11,6 +11,11 @@ import './App.css';
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminUserManagementPage from "./pages/AdminUserManagementPage";
+import AdminSubjectManagementPage from "./pages/AdminSubjectManagementPage";
+import AdminClassManagementPage from "./pages/AdminClassManagementPage";
+import AdminNotificationManagementPage from "./pages/AdminNotificationManagementPage";
+import AdminSettingManagementPage from "./pages/AdminSettingManagementPage";
+import EduQuizPage from "./pages/EduQuizPage";
 
 function AppRoutes() {
   const { user, loading, logout } = useAuth();
@@ -42,14 +47,20 @@ function AppRoutes() {
           path="/admin/users"
           element={<AdminUserManagementPage />}
         />
+        <Route path="/admin/subject" element={<AdminSubjectManagementPage />} />
+        <Route path="/admin/subjects" element={<AdminSubjectManagementPage />} />
+        <Route path="/admin/class" element={<AdminClassManagementPage />} />
+        <Route path="/admin/notifications" element={<AdminNotificationManagementPage />} />
+        <Route path="/admin/settings" element={<AdminSettingManagementPage />} />
         {!user ? (
           <>
             {/* Đăng nhập Teacher / Student */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
-
+            <Route path="/" element={<EduQuizPage />} />
+            <Route path="/home" element={<EduQuizPage />} />
             {/* Mặc định */}
-            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </>
         ) : (
           <>
