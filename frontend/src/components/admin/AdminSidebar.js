@@ -10,10 +10,12 @@ import {
   FaSignOutAlt 
 } from 'react-icons/fa';
 import { MdDashboard } from 'react-icons/md';
+import { useAuth } from '../../context/AuthContext';
 
 export default function AdminSidebar({ isSidebarOpen, setIsSidebarOpen, showToastMessage }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   // Các mục chính (phần trên)
   const mainNavItems = [
@@ -86,7 +88,7 @@ export default function AdminSidebar({ isSidebarOpen, setIsSidebarOpen, showToas
 
       {/* Nút Đăng xuất */}
       <div className="asm-logout-item" onClick={() => {
-        navigate('/admin');
+        logout();
       }}>
         <FaSignOutAlt className="asm-logout-icon" />
         <span>Đăng xuất</span>
