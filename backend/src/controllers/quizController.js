@@ -28,7 +28,7 @@ exports.createQuiz = async (req, res) => {
       showAnswerAfter,
       totalPoints,
       passingScore,
-      createdBy: req.user.userId,
+      createdBy: req.user.id,
     });
 
     await quiz.save();
@@ -43,13 +43,17 @@ exports.getQuizzes = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
 
-    const quizzes = await Quiz.find({ createdBy: req.user.userId })
+    const filter = req.user.role === 'student' 
+      ? { isPublished: true }
+      : { createdBy: req.user.id };
+
+    const quizzes = await Quiz.find(filter)
       .populate('createdBy', 'name email')
       .skip((page - 1) * limit)
       .limit(parseInt(limit))
       .sort({ createdAt: -1 });
 
-    const total = await Quiz.countDocuments({ createdBy: req.user.userId });
+    const total = await Quiz.countDocuments(filter);
 
     res.json({
       data: quizzes,
@@ -90,7 +94,7 @@ exports.updateQuiz = async (req, res) => {
       return res.status(404).json({ message: 'Đề thi không tồn tại' });
     }
 
-    if (quiz.createdBy.toString() !== req.user.userId) {
+    if (quiz.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa đề thi này' });
     }
 
@@ -124,7 +128,7 @@ exports.deleteQuiz = async (req, res) => {
       return res.status(404).json({ message: 'Đề thi không tồn tại' });
     }
 
-    if (quiz.createdBy.toString() !== req.user.userId) {
+    if (quiz.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền xóa đề thi này' });
     }
 
@@ -143,7 +147,7 @@ exports.publishQuiz = async (req, res) => {
       return res.status(404).json({ message: 'Đề thi không tồn tại' });
     }
 
-    if (quiz.createdBy.toString() !== req.user.userId) {
+    if (quiz.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền công bố đề thi này' });
     }
 

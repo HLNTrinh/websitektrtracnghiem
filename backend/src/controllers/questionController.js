@@ -21,7 +21,7 @@ exports.createQuestion = async (req, res) => {
       category,
       difficulty,
       explanation,
-      createdBy: req.user.userId,
+      createdBy: req.user.id,
     });
 
     await question.save();
@@ -35,7 +35,7 @@ exports.createQuestion = async (req, res) => {
 exports.getQuestions = async (req, res) => {
   try {
     const { category, difficulty, page = 1, limit = 10 } = req.query;
-    const filter = { createdBy: req.user.userId };
+    const filter = { createdBy: req.user.id };
 
     if (category) filter.category = category;
     if (difficulty) filter.difficulty = difficulty;
@@ -82,7 +82,7 @@ exports.updateQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Câu hỏi không tồn tại' });
     }
 
-    if (question.createdBy.toString() !== req.user.userId) {
+    if (question.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền chỉnh sửa câu hỏi này' });
     }
 
@@ -116,7 +116,7 @@ exports.deleteQuestion = async (req, res) => {
       return res.status(404).json({ message: 'Câu hỏi không tồn tại' });
     }
 
-    if (question.createdBy.toString() !== req.user.userId) {
+    if (question.createdBy.toString() !== req.user.id) {
       return res.status(403).json({ message: 'Bạn không có quyền xóa câu hỏi này' });
     }
 

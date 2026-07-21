@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/services';
@@ -11,17 +12,26 @@ const normalizeAuthError = (error) => {
   return 'Đã có lỗi xảy ra. Vui lòng thử lại.';
 };
 
+=======
+import { createContext, useContext, useState, useEffect } from "react";
+import { authService } from "../services/services";
+
+const AuthContext = createContext(null);
+
+>>>>>>> main
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
+
     if (!token) {
       setLoading(false);
       return;
     }
 
+<<<<<<< HEAD
     authService.getMe()
       .then((data) => {
         const currentUser = data?.user || data;
@@ -32,6 +42,19 @@ export const AuthProvider = ({ children }) => {
         console.log('Get user error:', normalizeAuthError(error));
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+=======
+    authService
+      .getMe()
+      .then((data) => {
+        setUser(data);
+        localStorage.setItem("user", JSON.stringify(data));
+      })
+      .catch((error) => {
+        console.log("Get user error:", error.message);
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+>>>>>>> main
         setUser(null);
       })
       .finally(() => {
@@ -39,6 +62,7 @@ export const AuthProvider = ({ children }) => {
       });
   }, []);
 
+<<<<<<< HEAD
   const login = async (email, password) => {
     try {
       const data = await authService.login({ email, password });
@@ -70,9 +94,69 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+=======
+  // Đăng nhập
+  const login = async (email, password) => {
+    const data = await authService.login({
+      email,
+      password,
+    });
+
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+
+    setUser(data.user);
+
+    return data;
+  };
+
+  // Đăng ký
+  const register = async (name, email, password) => {
+    return authService.register({
+      name,
+      email,
+      password,
+    });
+  };
+
+  // Đăng xuất
+  const logout = () => {
+    // Nếu có API logout thì gọi
+    if (authService.logout) {
+      authService.logout();
+    }
+
+    // Xóa dữ liệu đăng nhập
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Xóa user trong Context
+    setUser(null);
+
+    // Chuyển về trang đăng nhập
+    window.location.replace("/login");
+  };
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+      }}
+    >
+>>>>>>> main
       {!loading && children}
     </AuthContext.Provider>
   );
 };
 
+<<<<<<< HEAD
 export const useAuth = () => useContext(AuthContext);
+=======
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+>>>>>>> main

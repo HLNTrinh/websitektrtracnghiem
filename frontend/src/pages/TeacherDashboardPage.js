@@ -12,10 +12,11 @@ export const TeacherDashboardPage = () => {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await quizService.getQuizzes();
-      setQuizzes(response.data.data);
+      const data = await quizService.getQuizzes();
+      setQuizzes(data.data ?? []);
     } catch (error) {
       console.error('Failed to fetch quizzes:', error);
+      setQuizzes([]);
     } finally {
       setLoading(false);
     }
@@ -50,7 +51,7 @@ export const TeacherDashboardPage = () => {
               {quizzes.map((quiz) => (
                 <tr key={quiz._id}>
                   <td>{quiz.title}</td>
-                  <td>{quiz.questions.length}</td>
+                  <td>{quiz.questions?.length ?? 0}</td>
                   <td>{quiz.duration}</td>
                   <td>{quiz.maxAttempts}</td>
                   <td>

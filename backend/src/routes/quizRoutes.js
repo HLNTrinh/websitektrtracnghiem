@@ -11,9 +11,9 @@ const { authenticate, authorize } = require('../middlewares/auth');
 
 const router = express.Router();
 
-// Chỉ giáo viên và admin
+// Tất cả vai trò đã xác thực đều có thể xem
 router.post('/', authenticate, authorize('teacher', 'admin'), createQuiz);
-router.get('/', authenticate, authorize('teacher', 'admin'), getQuizzes);
+router.get('/', authenticate, authorize('student', 'teacher', 'admin'), getQuizzes);
 router.get('/:id', authenticate, getQuiz);
 router.put('/:id', authenticate, authorize('teacher', 'admin'), updateQuiz);
 router.delete('/:id', authenticate, authorize('teacher', 'admin'), deleteQuiz);
