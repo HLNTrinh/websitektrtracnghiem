@@ -1,156 +1,245 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './ExamTaking.css'
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { quizAttemptService } from "../services/services";
+import { useAuth } from "../context/AuthContext";
+import "./ExamTaking.css";
 
-const totalQuestions = 30
-const answered = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13])
-const markedForReview = new Set([4])
-
-const options = [
-  { key: 'A', text: '-2 < m < 2' },
-  { key: 'B', text: 'm < -2 hoặc m > 2' },
-  { key: 'C', text: '-4 < m < 0' },
-  { key: 'D', text: 'm = 0' },
-]
+const formatTime = (totalSeconds) => {
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
 
 export default function ExamTaking() {
-  const [current, setCurrent] = useState(13)
-  const [selected, setSelected] = useState('B')
-  const navigate = useNavigate()
+  const { quizId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const progressPct = Math.round((answered.size / totalQuestions) * 100)
+  const [quiz, setQuiz] = useState(null);
+  const [attemptId, setAttemptId] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [answers, setAnswers] = useState({}); // { [questionId]: optionIndex }
+  const [flagged, setFlagged] = useState({}); // { [questionId]: true }
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  const startQuiz = useCallback(async () => {
+    try {
+      const res = await quizAttemptService.startQuizAttempt(quizId);
+      setQuiz(res.data.quiz);
+      setAttemptId(res.data.attemptId);
+      setTimeLeft(res.data.quiz.duration * 60);
+    } catch (err) {
+      console.error("Failed to start quiz:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [quizId]);
+
+  useEffect(() => {
+    startQuiz();
+  }, [startQuiz]);
+
+  const handleSubmit = useCallback(async () => {
+    try {
+      await quizAttemptService.submitQuiz(attemptId);
+      navigate(`/result/${attemptId}`);
+    } catch (err) {
+      console.error("Failed to submit quiz:", err);
+    }
+  }, [attemptId, navigate]);
+
+  useEffect(() => {
+    if (timeLeft <= 0 || !attemptId) return;
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleSubmit();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [timeLeft, attemptId, handleSubmit]);
+
+  const question = quiz?.questions?.[currentIndex];
+
+  const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
+  const flaggedCount = useMemo(() => Object.keys(flagged).length, [flagged]);
+  const totalQuestions = quiz?.questions?.length || 0;
+  const blankCount = totalQuestions - answeredCount;
+  const progressPct = totalQuestions ? Math.round((answeredCount / totalQuestions) * 100) : 0;
+
+  const handleSelectAnswer = async (optionIndex) => {
+    if (!question) return;
+    setAnswers((prev) => ({ ...prev, [question._id]: optionIndex }));
+    try {
+      await quizAttemptService.saveAnswer(attemptId, {
+        questionId: question._id,
+        selectedOptionIndex: optionIndex,
+      });
+    } catch (err) {
+      console.error("Failed to save answer:", err);
+    }
+  };
+
+  const toggleFlag = () => {
+    if (!question) return;
+    setFlagged((prev) => {
+      const next = { ...prev };
+      if (next[question._id]) delete next[question._id];
+      else next[question._id] = true;
+      return next;
+    });
+  };
+
+  const goTo = (index) => {
+    if (index >= 0 && index < totalQuestions) setCurrentIndex(index);
+  };
+
+  if (loading) return <div className="exam-loading">Đang tải...</div>;
+  if (!quiz || !question) return <div className="exam-loading">Không thể tải đề thi</div>;
 
   return (
     <div className="exam-take-shell">
-      <header className="take-topbar">
-        <div className="take-brand">
-          <CapIcon />
-          <span>Kiểm tra Cuối kỳ: Giải tích 1</span>
+      <header className="exam-take-header">
+        <div className="exam-take-brand">
+          <span className="exam-take-logo">🎓</span>
+          <h1>{quiz.title}</h1>
         </div>
-        <div className="take-topbar-right">
-          <div className="timer-pill">
-            <ClockIcon />
-            <span>45:22</span>
+        <div className="exam-take-header-actions">
+          <div className={`exam-timer-chip ${timeLeft < 60 ? "danger" : ""}`}>
+            ⏱ {formatTime(timeLeft)}
           </div>
-          <button className="btn-submit" onClick={() => navigate('/ket-qua')}>Nộp bài</button>
+          <button className="btn-submit-exam" onClick={handleSubmit}>
+            Nộp bài
+          </button>
         </div>
       </header>
 
-      <div className="take-progress-row">
-        <span>Tiến độ làm bài: {answered.size}/{totalQuestions} câu</span>
-        <span className="pct">{progressPct}% Hoàn thành</span>
+      <div className="exam-take-progress">
+        <span>Tiến độ làm bài: {answeredCount}/{totalQuestions} câu</span>
+        <span className="progress-pct">{progressPct}% Hoàn thành</span>
       </div>
-      <div className="take-progress-track">
-        <div className="take-progress-fill" style={{ width: progressPct + '%' }} />
+      <div className="progress-track-exam">
+        <div className="progress-fill-exam" style={{ width: `${progressPct}%` }} />
       </div>
 
-      <div className="take-body">
-        <section className="question-card">
-          <div className="question-head">
+      <div className="exam-take-body">
+        <div className="exam-question-card">
+          <div className="exam-question-top">
             <div>
-              <span className="q-eyebrow">CÂU HỎI {current}</span>
-              <div className="q-tags">
-                <span className="tag">ĐẠI SỐ</span>
-                <span className="tag">MỨC ĐỘ: KHÁ</span>
+              <span className="exam-question-label">CÂU HỎI {currentIndex + 1}</span>
+              <div className="exam-question-tags">
+                {question.topic && <span className="tag-pill">{question.topic}</span>}
+                {question.difficulty && (
+                  <span className="tag-pill">MỨC ĐỘ: {question.difficulty}</span>
+                )}
               </div>
             </div>
-            <button className="review-btn">
-              <BookmarkIcon /> Xem sau
+            <button
+              className={`btn-flag ${flagged[question._id] ? "active" : ""}`}
+              onClick={toggleFlag}
+            >
+              🔖 {flagged[question._id] ? "Bỏ đánh dấu" : "Xem sau"}
             </button>
           </div>
 
-          <p className="q-text">
-            Cho hàm số $f(x) = x^3 - 3x^2 + 2$. Tìm tất cả các giá trị của tham số $m$ để đường thẳng $y = m$ cắt đồ thị hàm số tại 3 điểm phân biệt?
-          </p>
+          <p className="exam-question-content">{question.content}</p>
 
-          <div className="q-figure" />
+          {question.image && (
+            <img className="exam-question-image" src={question.image} alt="" />
+          )}
 
-          <div className="q-options">
-            {options.map((o) => (
-              <label
-                key={o.key}
-                className={'q-option' + (selected === o.key ? ' checked' : '')}
-              >
-                <input
-                  type="radio"
-                  name="answer"
-                  checked={selected === o.key}
-                  onChange={() => setSelected(o.key)}
-                />
-                <span className="radio-dot" />
-                <span>{o.key}. {o.text}</span>
-              </label>
-            ))}
-          </div>
-
-          <div className="q-nav-row">
-            <button className="btn-outline" onClick={() => setCurrent((c) => Math.max(1, c - 1))}>
-              ← Câu trước
-            </button>
-            <button className="btn-primary" onClick={() => setCurrent((c) => Math.min(totalQuestions, c + 1))}>
-              Câu tiếp theo →
-            </button>
-          </div>
-        </section>
-
-        <aside className="question-panel">
-          <h3>Danh sách câu hỏi</h3>
-          <div className="panel-stats">
-            <div className="panel-stat">
-              <span className="ps-value">{answered.size}</span>
-              <span className="ps-label">ĐÃ CHỌN</span>
-            </div>
-            <div className="panel-stat">
-              <span className="ps-value">{totalQuestions - answered.size}</span>
-              <span className="ps-label">TRỐNG</span>
-            </div>
-            <div className="panel-stat marked">
-              <BookmarkIcon />
-              <span className="ps-label">XEM SAU</span>
-            </div>
-          </div>
-
-          <div className="q-grid">
-            {Array.from({ length: totalQuestions }, (_, i) => i + 1).map((n) => (
+          <div className="exam-options">
+            {question.options.map((option, idx) => (
               <button
-                key={n}
-                className={
-                  'q-num' +
-                  (n === current ? ' current' : '') +
-                  (markedForReview.has(n) ? ' marked' : answered.has(n) ? ' answered' : '')
-                }
-                onClick={() => setCurrent(n)}
+                key={idx}
+                className={`exam-option ${answers[question._id] === idx ? "selected" : ""}`}
+                onClick={() => handleSelectAnswer(idx)}
               >
-                {n}
+                <span className="exam-option-radio" />
+                <span>
+                  {String.fromCharCode(65 + idx)}. {option.text}
+                </span>
               </button>
             ))}
           </div>
 
-          <div className="panel-user">
-            <img src="https://i.pravatar.cc/64?img=15" alt="" />
-            <div>
-              <div className="pu-name">Nguyễn Văn An <span className="pu-dot" /></div>
-              <div className="pu-id">MSSV: 202410029</div>
+          <div className="exam-nav-row">
+            <button
+              className="btn-outline"
+              onClick={() => goTo(currentIndex - 1)}
+              disabled={currentIndex === 0}
+            >
+              ← Câu trước
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => goTo(currentIndex + 1)}
+              disabled={currentIndex === totalQuestions - 1}
+            >
+              Câu tiếp theo →
+            </button>
+          </div>
+        </div>
+
+        <aside className="exam-sidebar">
+          <div className="card exam-qlist-card">
+            <h3>Danh sách câu hỏi</h3>
+            <div className="exam-qlist-stats">
+              <div className="qlist-stat">
+                <span className="qlist-stat-value chosen">{answeredCount}</span>
+                <span className="qlist-stat-label">ĐÃ CHỌN</span>
+              </div>
+              <div className="qlist-stat">
+                <span className="qlist-stat-value blank">{blankCount}</span>
+                <span className="qlist-stat-label">TRỐNG</span>
+              </div>
+              <div className="qlist-stat">
+                <span className="qlist-stat-value flag">🔖</span>
+                <span className="qlist-stat-label">XEM SAU</span>
+              </div>
+            </div>
+
+            <div className="exam-qgrid">
+              {quiz.questions.map((q, idx) => {
+                const isCurrent = idx === currentIndex;
+                const isFlagged = flagged[q._id];
+                const isAnswered = answers[q._id] !== undefined;
+                let cls = "qgrid-btn";
+                if (isCurrent) cls += " current";
+                else if (isFlagged) cls += " flagged";
+                else if (isAnswered) cls += " answered";
+                return (
+                  <button key={q._id} className={cls} onClick={() => goTo(idx)}>
+                    {idx + 1}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="panel-note">
+          <div className="card exam-student-card">
+            <img
+              className="exam-student-avatar"
+              src={user?.avatar || "https://i.pravatar.cc/64?img=12"}
+              alt=""
+            />
+            <div>
+              <div className="exam-student-name">{user?.name || "Học sinh"}</div>
+              <div className="exam-student-msv">MSSV: {user?.studentId || "—"}</div>
+            </div>
+          </div>
+
+          <div className="exam-notice-box">
             ℹ️ Hệ thống tự động lưu đáp án sau mỗi lần chọn. Nếu gặp sự cố mạng, hãy giữ nguyên màn hình và liên hệ giám thị.
           </div>
         </aside>
       </div>
 
-      <button className="support-fab">🎧 Hỗ trợ</button>
+      <button className="exam-support-btn">🎧 Hỗ trợ</button>
     </div>
-  )
-}
-
-function CapIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3 1 8l11 5 9-4.09V17h2V8L12 3Z" fill="currentColor" /></svg>
-}
-function ClockIcon() {
-  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" /><path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-}
-function BookmarkIcon() {
-  return <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M6 4h12v16l-6-3.5L6 20V4Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+  );
 }
