@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { quizService } from '../services/authService';
+import { quizService } from '../services/services';
 import '../styles/Dashboard.css';
 
 export const TeacherDashboardPage = () => {
