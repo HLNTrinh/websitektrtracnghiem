@@ -1,12 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import "./ExamList.css";
-import Sidebar from "../components/Sidebar";
+import "../styles/ExamList.css";
 const tabs = ['Tất cả', 'Toán học', 'Ngữ văn', 'Tiếng Anh', 'Vật lý', 'Hóa học', 'Sinh học']
 
 const exams = [
   {
+    quizId: 'giai-tich-12-giua-ky',
     subject: 'Toán học',
     status: 'Đang diễn ra',
     statusType: 'live',
@@ -21,6 +20,7 @@ const exams = [
     duration: 45,
   },
   {
+    quizId: 'nghi-luan-van-hoc',
     subject: 'Ngữ văn',
     status: 'Đã bắt đầu',
     statusType: 'started',
@@ -35,6 +35,7 @@ const exams = [
     duration: 90,
   },
   {
+    quizId: 'english-proficiency-test',
     subject: 'Tiếng Anh',
     status: 'Đang diễn ra',
     statusType: 'live',
@@ -49,6 +50,7 @@ const exams = [
     duration: 60,
   },
   {
+    quizId: 'vat-ly-chuong-1',
     subject: 'Vật lý',
     status: 'Sắp diễn ra',
     statusType: 'upcoming',
@@ -63,6 +65,7 @@ const exams = [
     duration: 45,
   },
   {
+    quizId: 'hoa-huu-co-11',
     subject: 'Hóa học',
     status: 'Đã hoàn thành',
     statusType: 'done',
@@ -78,96 +81,112 @@ const exams = [
 export default function ExamList() {
   const [activeTab, setActiveTab] = useState('Tất cả')
   const [modalExam, setModalExam] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
 
+  const filteredExams = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    return exams.filter((e) => {
+      const matchesTab = activeTab === 'Tất cả' || e.subject === activeTab
+      const matchesSearch =
+        !q ||
+        e.title.toLowerCase().includes(q) ||
+        e.subject.toLowerCase().includes(q)
+      return matchesTab && matchesSearch
+    })
+  }, [activeTab, searchQuery])
+
   return (
-    <div className="page-shell">
-      <Sidebar />
-      <main className="exam-main">
-        <header className="exam-topbar">
-          <div className="search-box">
-            <SearchIcon />
-            <input placeholder="Tìm kiếm bài thi..." />
-          </div>
-          <div className="dash-header-actions">
-            <button className="icon-btn"><BellIcon /></button>
-            <button className="icon-btn"><HelpIcon /></button>
-            <div className="user-chip">
-              <img src="https://i.pravatar.cc/64?img=13" alt="" />
-              <div className="user-chip-text">
-                <span className="name">Nguyễn Minh Quân</span>
-                <span className="role">Học sinh lớp 12A1</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <h1>Danh sách bài thi</h1>
-        <p className="exam-sub">Luyện tập và kiểm tra kiến thức của bạn thông qua các bài thi được biên soạn kỹ lưỡng.</p>
-
-        <div className="tab-row">
-          {tabs.map((t) => (
-            <button
-              key={t}
-              className={'tab-pill' + (activeTab === t ? ' active' : '')}
-              onClick={() => setActiveTab(t)}
-            >
-              {t}
-            </button>
-          ))}
+    <main className="exam-main">
+      <header className="exam-topbar">
+        <div className="search-box">
+          <SearchIcon />
+          <input
+            placeholder="Tìm kiếm bài thi..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-
-        <div className="exam-grid">
-          {exams.map((e) => (
-            <div className="exam-card" key={e.title}>
-              <div className="exam-card-top">
-                <span className={'subject-pill subject-' + slug(e.subject)}>{e.subject}</span>
-                <span className={'status-pill status-' + e.statusType}>
-                  {e.statusType === 'live' && <i className="live-dot" />}
-                  {e.status}
-                </span>
-              </div>
-              <h3>{e.title}</h3>
-              <div className="exam-card-meta">
-                {e.time && <span><ClockIcon /> {e.time}</span>}
-                {e.meta && <span>{e.metaIcon === 'timer' ? <TimerIcon /> : e.metaIcon === 'check' ? <CheckIcon /> : <CalendarIcon />} {e.meta}</span>}
-                {e.questions && <span><QIcon /> {e.questions}</span>}
-                {e.progress && <span><ProgressIcon /> {e.progress}</span>}
-                {e.result && <span><StarIcon /> {e.result}</span>}
-              </div>
-              <button
-                className={
-                  e.ctaType === 'primary' ? 'btn-primary full' :
-                  e.ctaType === 'outline' ? 'btn-outline full' : 'btn-disabled full'
-                }
-                disabled={e.ctaType === 'disabled'}
-                onClick={() => {
-                  if (e.ctaType === 'primary') setModalExam(e)
-                  else if (e.cta === 'Tiếp tục làm bài') navigate('/lam-bai')
-                  else if (e.cta === 'Xem lại kết quả') navigate('/ket-qua')
-                }}
-              >
-                {e.cta}
-              </button>
+        <div className="dash-header-actions">
+          <button className="icon-btn"><BellIcon /></button>
+          <button className="icon-btn"><HelpIcon /></button>
+          <div className="user-chip">
+            <img src="https://i.pravatar.cc/64?img=13" alt="" />
+            <div className="user-chip-text">
+              <span className="name">Nguyễn Minh Quân</span>
+              <span className="role">Học sinh lớp 12A1</span>
             </div>
-          ))}
+          </div>
+        </div>
+      </header>
 
+      <h1>Danh sách bài thi</h1>
+      <p className="exam-sub">Luyện tập và kiểm tra kiến thức của bạn thông qua các bài thi được biên soạn kỹ lưỡng.</p>
+
+      <div className="tab-row">
+        {tabs.map((t) => (
+          <button
+            key={t}
+            className={'tab-pill' + (activeTab === t ? ' active' : '')}
+            onClick={() => setActiveTab(t)}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="exam-grid">
+        {filteredExams.map((e) => (
+          <div className="exam-card" key={e.title}>
+            <div className="exam-card-top">
+              <span className={'subject-pill subject-' + slug(e.subject)}>{e.subject}</span>
+              <span className={'status-pill status-' + e.statusType}>
+                {e.statusType === 'live' && <i className="live-dot" />}
+                {e.status}
+              </span>
+            </div>
+            <h3>{e.title}</h3>
+            <div className="exam-card-meta">
+              {e.time && <span><ClockIcon /> {e.time}</span>}
+              {e.meta && <span>{e.metaIcon === 'timer' ? <TimerIcon /> : e.metaIcon === 'check' ? <CheckIcon /> : <CalendarIcon />} {e.meta}</span>}
+              {e.questions && <span><QIcon /> {e.questions}</span>}
+              {e.progress && <span><ProgressIcon /> {e.progress}</span>}
+              {e.result && <span><StarIcon /> {e.result}</span>}
+            </div>
+            <button
+              className={
+                e.ctaType === 'primary' ? 'btn-primary full' :
+                e.ctaType === 'outline' ? 'btn-outline full' : 'btn-disabled full'
+              }
+              disabled={e.ctaType === 'disabled'}
+              onClick={() => {
+                if (e.ctaType === 'primary') setModalExam(e)
+                else if (e.cta === 'Tiếp tục làm bài') navigate(`/quiz/${e.quizId}`)
+                else if (e.cta === 'Xem lại kết quả') navigate('/ket-qua')
+              }}
+            >
+              {e.cta}
+            </button>
+          </div>
+        ))}
+
+        {filteredExams.length === 0 && (
           <div className="exam-card empty-card">
             <BookIcon />
-            <h4>Đang chờ cập nhật</h4>
-            <p>Các bài thi mới từ giáo viên của bạn sẽ xuất hiện tại đây.</p>
+            <h4>Không tìm thấy bài thi</h4>
+            <p>Thử từ khóa khác hoặc chọn lại môn học.</p>
           </div>
-        </div>
-      </main>
+        )}
+      </div>
 
       {modalExam && (
         <ConfirmModal
           exam={modalExam}
           onClose={() => setModalExam(null)}
-          onStart={() => navigate('/lam-bai')}
+          onStart={() => navigate(`/quiz/${modalExam.quizId}`)}
         />
       )}
-    </div>
+    </main>
   )
 }
 

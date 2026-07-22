@@ -7,30 +7,25 @@ export default function Sidebar() {
 
     return (
         <aside className="sidebar">
-
-            <h2 className="logo">EduQuiz</h2>
-
-            {/* Thông tin người dùng */}
-            <div className="sidebar-user">
-                <img
-                    src={user?.avatar || "https://i.pravatar.cc/80?img=12"}
-                    alt="avatar"
-                    className="sidebar-avatar"
-                />
-
-                <h3>{user?.name || "Học sinh"}</h3>
-
-                <p>{user?.email}</p>
+            {/* Logo */}
+            <div className="sidebar-logo">
+                <div className="logo-icon">🎓</div>
+                <div>
+                    <h2 className="logo-title">EduQuiz</h2>
+                    <p className="logo-subtitle">HỌC SINH</p>
+                </div>
             </div>
 
+          
+            {/* Navigation */}
             <nav className="sidebar-nav">
-
                 <NavLink
                     to="/student/dashboard"
                     className={({ isActive }) =>
                         isActive ? "sidebar-link active" : "sidebar-link"
                     }
                 >
+                    <span className="link-icon">📊</span>
                     Tổng quan
                 </NavLink>
 
@@ -40,6 +35,7 @@ export default function Sidebar() {
                         isActive ? "sidebar-link active" : "sidebar-link"
                     }
                 >
+                    <span className="link-icon">📝</span>
                     Bài thi
                 </NavLink>
 
@@ -49,6 +45,7 @@ export default function Sidebar() {
                         isActive ? "sidebar-link active" : "sidebar-link"
                     }
                 >
+                    <span className="link-icon">📜</span>
                     Lịch sử
                 </NavLink>
 
@@ -58,11 +55,28 @@ export default function Sidebar() {
                         isActive ? "sidebar-link active" : "sidebar-link"
                     }
                 >
+                    <span className="link-icon">👤</span>
                     Hồ sơ
                 </NavLink>
-
             </nav>
 
+            {/* Bottom Section */}
+            <div className="sidebar-bottom">
+                <NavLink
+                    to="/student/settings"
+                    className={({ isActive }) =>
+                        isActive ? "sidebar-link active" : "sidebar-link"
+                    }
+                >
+                    <span className="link-icon">⚙️</span>
+                    Cài đặt
+                </NavLink>
+
+                <button className="logout-btn">
+                    <span className="link-icon">↪️</span>
+                    Đăng xuất
+                </button>
+            </div>
         </aside>
     );
 }

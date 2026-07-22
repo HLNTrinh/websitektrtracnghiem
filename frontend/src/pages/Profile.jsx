@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import Sidebar from '../components/Sidebar.jsx'
-import './Profile.css'
+import '../styles/Profile.css'
 
 export default function Profile() {
   const [emailNotif, setEmailNotif] = useState(true)
@@ -10,113 +9,110 @@ export default function Profile() {
   const [showConfirm, setShowConfirm] = useState(false)
 
   return (
-    <div className="page-shell">
-      <Sidebar role="QUẢN TRỊ VIÊN" />
-      <main className="profile-main">
-        <header className="profile-topbar">
-          <h1>Hồ sơ cá nhân</h1>
-          <div className="dash-header-actions">
-            <button className="icon-btn"><BellIcon /></button>
-            <button className="icon-btn"><HelpIcon /></button>
-            <div className="user-chip">
-              <img src="https://i.pravatar.cc/64?img=33" alt="" />
-              <div className="user-chip-text">
-                <span className="name">Nguyễn Văn A</span>
-                <span className="role">Quản trị viên</span>
-              </div>
+    <div className="profile-main">
+      <header className="profile-topbar">
+        <h1>Hồ sơ cá nhân</h1>
+        <div className="dash-header-actions">
+          <button className="icon-btn"><BellIcon /></button>
+          <button className="icon-btn"><HelpIcon /></button>
+          <div className="user-chip">
+            <img src="https://i.pravatar.cc/64?img=33" alt="" />
+            <div className="user-chip-text">
+              <span className="name">Nguyễn Văn A</span>
+              <span className="role">Quản trị viên</span>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-        <section className="profile-grid">
-          <div className="card profile-info-card">
-            <div className="profile-info-top">
-              <div className="avatar-wrap">
-                <img src="https://i.pravatar.cc/200?img=33" alt="" />
-                <button className="avatar-edit"><CameraIcon /></button>
-              </div>
-              <div className="profile-name-block">
-                <h2>Nguyễn Văn A</h2>
-                <div className="badges">
-                  <span className="role-badge">QUẢN TRỊ VIÊN</span>
-                  <span className="status-dot" /> Hoạt động
-                </div>
-              </div>
-              <button className="btn-primary"><EditIcon /> Cập nhật thông tin</button>
+      <section className="profile-grid">
+        <div className="card profile-info-card">
+          <div className="profile-info-top">
+            <div className="avatar-wrap">
+              <img src="https://i.pravatar.cc/200?img=33" alt="" />
+              <button className="avatar-edit"><CameraIcon /></button>
             </div>
+            <div className="profile-name-block">
+              <h2>Nguyễn Văn A</h2>
+              <div className="badges">
+                <span className="role-badge">QUẢN TRỊ VIÊN</span>
+                <span className="status-dot" /> Hoạt động
+              </div>
+            </div>
+            <button className="btn-primary"><EditIcon /> Cập nhật thông tin</button>
+          </div>
 
-            <div className="info-fields">
-              <div className="info-field">
-                <span className="if-label"><MailIcon /> EMAIL CÁ NHÂN</span>
-                <span className="if-value">nguyenvana@eduquiz.vn</span>
-              </div>
-              <div className="info-field">
-                <span className="if-label"><PhoneIcon /> SỐ ĐIỆN THOẠI</span>
-                <span className="if-value">090 123 4567</span>
-              </div>
-              <div className="info-field">
-                <span className="if-label"><BriefcaseIcon /> VAI TRÒ</span>
-                <span className="if-value">Quản lý hệ thống (Super Admin)</span>
-              </div>
-              <div className="info-field">
-                <span className="if-label"><CalendarIcon /> NGÀY THAM GIA</span>
-                <span className="if-value">15/05/2023</span>
-              </div>
+          <div className="info-fields">
+            <div className="info-field">
+              <span className="if-label"><MailIcon /> EMAIL CÁ NHÂN</span>
+              <span className="if-value">nguyenvana@eduquiz.vn</span>
+            </div>
+            <div className="info-field">
+              <span className="if-label"><PhoneIcon /> SỐ ĐIỆN THOẠI</span>
+              <span className="if-value">090 123 4567</span>
+            </div>
+            <div className="info-field">
+              <span className="if-label"><BriefcaseIcon /> VAI TRÒ</span>
+              <span className="if-value">Quản lý hệ thống (Super Admin)</span>
+            </div>
+            <div className="info-field">
+              <span className="if-label"><CalendarIcon /> NGÀY THAM GIA</span>
+              <span className="if-value">15/05/2023</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="card settings-card">
+          <h3><SlidersIcon /> Cài đặt hệ thống</h3>
+
+          <label className="field-label">Ngôn ngữ hiển thị</label>
+          <select className="select-field" defaultValue="vi">
+            <option value="vi">Tiếng Việt (Việt Nam)</option>
+            <option value="en">English (US)</option>
+          </select>
+
+          <div className="field-label" style={{ marginTop: 22 }}>Thông báo ứng dụng</div>
+          <div className="toggle-row">
+            <span><MailIcon /> Thông báo qua Email</span>
+            <Toggle checked={emailNotif} onChange={() => setEmailNotif((v) => !v)} />
+          </div>
+          <div className="toggle-row">
+            <span><BellOutlineIcon /> Thông báo đẩy (Push)</span>
+            <Toggle checked={pushNotif} onChange={() => setPushNotif((v) => !v)} />
+          </div>
+
+          <button className="btn-primary full" style={{ marginTop: 24 }}>Lưu cấu hình</button>
+        </div>
+      </section>
+
+      <section className="card security-card">
+        <div className="security-left">
+          <h3><ShieldIcon /> Bảo mật tài khoản</h3>
+          <p>Đảm bảo tài khoản của bạn luôn an toàn bằng cách sử dụng mật khẩu mạnh và thay đổi định kỳ mỗi 3 tháng.</p>
+          <div className="tip-box">
+            ℹ️ Mật khẩu nên chứa ít nhất 8 ký tự, bao gồm cả chữ hoa, chữ thường và chữ số.
+          </div>
+        </div>
+        <div className="security-right">
+          <label className="field-label">Mật khẩu hiện tại</label>
+          <PasswordInput visible={showCurrent} onToggle={() => setShowCurrent((v) => !v)} />
+
+          <div className="pw-row">
+            <div>
+              <label className="field-label">Mật khẩu mới</label>
+              <PasswordInput visible={showNew} onToggle={() => setShowNew((v) => !v)} />
+            </div>
+            <div>
+              <label className="field-label">Xác nhận mật khẩu mới</label>
+              <PasswordInput visible={showConfirm} onToggle={() => setShowConfirm((v) => !v)} />
             </div>
           </div>
 
-          <div className="card settings-card">
-            <h3><SlidersIcon /> Cài đặt hệ thống</h3>
+          <button className="btn-dark">Đổi mật khẩu</button>
+        </div>
+      </section>
 
-            <label className="field-label">Ngôn ngữ hiển thị</label>
-            <select className="select-field" defaultValue="vi">
-              <option value="vi">Tiếng Việt (Việt Nam)</option>
-              <option value="en">English (US)</option>
-            </select>
-
-            <div className="field-label" style={{ marginTop: 22 }}>Thông báo ứng dụng</div>
-            <div className="toggle-row">
-              <span><MailIcon /> Thông báo qua Email</span>
-              <Toggle checked={emailNotif} onChange={() => setEmailNotif((v) => !v)} />
-            </div>
-            <div className="toggle-row">
-              <span><BellOutlineIcon /> Thông báo đẩy (Push)</span>
-              <Toggle checked={pushNotif} onChange={() => setPushNotif((v) => !v)} />
-            </div>
-
-            <button className="btn-primary full" style={{ marginTop: 24 }}>Lưu cấu hình</button>
-          </div>
-        </section>
-
-        <section className="card security-card">
-          <div className="security-left">
-            <h3><ShieldIcon /> Bảo mật tài khoản</h3>
-            <p>Đảm bảo tài khoản của bạn luôn an toàn bằng cách sử dụng mật khẩu mạnh và thay đổi định kỳ mỗi 3 tháng.</p>
-            <div className="tip-box">
-              ℹ️ Mật khẩu nên chứa ít nhất 8 ký tự, bao gồm cả chữ hoa, chữ thường và chữ số.
-            </div>
-          </div>
-          <div className="security-right">
-            <label className="field-label">Mật khẩu hiện tại</label>
-            <PasswordInput visible={showCurrent} onToggle={() => setShowCurrent((v) => !v)} />
-
-            <div className="pw-row">
-              <div>
-                <label className="field-label">Mật khẩu mới</label>
-                <PasswordInput visible={showNew} onToggle={() => setShowNew((v) => !v)} />
-              </div>
-              <div>
-                <label className="field-label">Xác nhận mật khẩu mới</label>
-                <PasswordInput visible={showConfirm} onToggle={() => setShowConfirm((v) => !v)} />
-              </div>
-            </div>
-
-            <button className="btn-dark">Đổi mật khẩu</button>
-          </div>
-        </section>
-
-        <footer className="profile-footer">© 2024 EduQuiz. Hỗ trợ kỹ thuật: support@eduquiz.vn</footer>
-      </main>
+      <footer className="profile-footer">© 2024 EduQuiz. Hỗ trợ kỹ thuật: support@eduquiz.vn</footer>
     </div>
   )
 }
