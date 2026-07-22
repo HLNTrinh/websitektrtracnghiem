@@ -620,7 +620,7 @@ export default function EduQuizPage() {
         <div className="eduquiz-container">
           <div className="playground-header text-center">
             <span className="section-tag" style={{ color: 'var(--color-primary)' }}>Trải nghiệm trực tuyến</span>
-            <h2 className="section-title">Hệ thống thi thử & tạo đề thi EduQuiz</h2>
+            <h2 className="section-title">Hệ thống thi thử và tạo đề thi EduQuiz</h2>
             <p className="text-muted" style={{ maxWidth: '640px', margin: '0 auto' }}>
               Hãy chọn một đề thi mẫu dưới đây để bắt đầu làm bài ngay lập tức, hoặc tự tạo một đề thi tùy chỉnh cho riêng bạn!
             </p>
@@ -642,6 +642,7 @@ export default function EduQuizPage() {
               onClick={() => {
                 setActiveTab('creator');
                 setQuizStarted(false);
+                
                 setSelectedQuiz(null);
               }}
             >
