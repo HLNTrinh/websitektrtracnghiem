@@ -594,7 +594,7 @@ export default function AdminClassManagementPage() {
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Giáo viên chủ nhiệm <span className="required">*</span></label>
+                  <label className="form-label">Giáo viên/Giảng viên <span className="required">*</span></label>
                   <input 
                     type="text" 
                     className="form-input" 
