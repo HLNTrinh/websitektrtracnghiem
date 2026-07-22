@@ -10,6 +10,7 @@ import {
   UserPlus, 
   SlidersHorizontal, 
   Eye, 
+  EyeOff,
   Edit, 
   Lock, 
   Unlock, 
@@ -52,7 +53,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[0],
     phone: '0912 345 678',
     gender: 'Nữ',
-    schoolClass: 'Sư phạm Văn K45'
+    schoolClass: 'Sư phạm Văn K45',
+    password: 'LanAnh@2023'
   },
   {
     id: '#USR-8290',
@@ -64,7 +66,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[1],
     phone: '0987 654 321',
     gender: 'Nam',
-    schoolClass: 'Lớp 12A1'
+    schoolClass: 'Lớp 12A1',
+    password: 'Hoang123@'
   },
   {
     id: '#USR-8285',
@@ -76,7 +79,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[2],
     phone: '0903 111 222',
     gender: 'Nam',
-    schoolClass: 'Phòng Đào tạo'
+    schoolClass: 'Phòng Đào tạo',
+    password: 'HungLV@2023'
   },
   {
     id: '#USR-8280',
@@ -88,7 +92,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[3],
     phone: '0934 555 666',
     gender: 'Nữ',
-    schoolClass: 'Lớp 11B3'
+    schoolClass: 'Lớp 11B3',
+    password: 'Trang@123'
   },
   {
     id: '#USR-8275',
@@ -100,7 +105,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[4],
     phone: '0915 222 333',
     gender: 'Nam',
-    schoolClass: 'Sư phạm Toán K43'
+    schoolClass: 'Sư phạm Toán K43',
+    password: 'GiangDH@123'
   },
   {
     id: '#USR-8270',
@@ -112,7 +118,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[5],
     phone: '0978 999 000',
     gender: 'Nữ',
-    schoolClass: 'Lớp 10C2'
+    schoolClass: 'Lớp 10C2',
+    password: 'Mylinh@123'
   },
   {
     id: '#USR-8265',
@@ -124,7 +131,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[6],
     phone: '0966 444 333',
     gender: 'Nam',
-    schoolClass: 'Lớp 12A5'
+    schoolClass: 'Lớp 12A5',
+    password: 'QuocBao@123'
   },
   {
     id: '#USR-8260',
@@ -136,7 +144,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[7],
     phone: '0909 888 777',
     gender: 'Nữ',
-    schoolClass: 'Ban Giám hiệu'
+    schoolClass: 'Ban Giám hiệu',
+    password: 'DuongHT@123'
   },
   {
     id: '#USR-8255',
@@ -148,7 +157,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[8],
     phone: '0914 777 888',
     gender: 'Nam',
-    schoolClass: 'Tổ Vật Lý'
+    schoolClass: 'Tổ Vật Lý',
+    password: 'VanKhai@123'
   },
   {
     id: '#USR-8250',
@@ -160,7 +170,8 @@ const INITIAL_USERS = [
     avatar: AVATARS[9],
     phone: '0945 111 000',
     gender: 'Nữ',
-    schoolClass: 'Lớp 11A2'
+    schoolClass: 'Lớp 11A2',
+    password: 'PhuongThao@123'
   }
 ];
 
@@ -182,6 +193,7 @@ export default function AdminUserManagementPage() {
   
   // Mobile sidebar state
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
   // Toast State
   const [toast, setToast] = useState(null);
@@ -194,7 +206,8 @@ export default function AdminUserManagementPage() {
     status: 'Hoạt động',
     phone: '',
     gender: 'Nam',
-    schoolClass: ''
+    schoolClass: '',
+    password: ''
   });
 
   const showToast = (message) => {
@@ -242,7 +255,8 @@ export default function AdminUserManagementPage() {
       avatar: AVATARS[randomAvatarIndex],
       phone: formData.phone || 'Chưa cập nhật',
       gender: formData.gender,
-      schoolClass: formData.schoolClass || 'Chưa cập nhật'
+      schoolClass: formData.schoolClass || 'Chưa cập nhật',
+      password: formData.password || '123456'
     };
 
     setUsers([newUser, ...users]);
@@ -261,7 +275,8 @@ export default function AdminUserManagementPage() {
       status: user.status,
       phone: user.phone || '',
       gender: user.gender || 'Nam',
-      schoolClass: user.schoolClass || ''
+      schoolClass: user.schoolClass || '',
+      password: user.password || ''
     });
     setIsEditModalOpen(true);
   };
@@ -284,7 +299,8 @@ export default function AdminUserManagementPage() {
           status: formData.status,
           phone: formData.phone,
           gender: formData.gender,
-          schoolClass: formData.schoolClass
+          schoolClass: formData.schoolClass,
+          password: formData.password || selectedUser.password
         };
       }
       return u;
@@ -321,7 +337,8 @@ export default function AdminUserManagementPage() {
       status: 'Hoạt động',
       phone: '',
       gender: 'Nam',
-      schoolClass: ''
+      schoolClass: '',
+      password: ''
     });
     setSelectedUser(null);
   };
@@ -657,6 +674,9 @@ export default function AdminUserManagementPage() {
                     <label className="form-label">Mật khẩu</label>
                     <input
                       type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
                       className="form-input"
                       placeholder="Nhập mật khẩu"
                     />
@@ -759,6 +779,48 @@ export default function AdminUserManagementPage() {
                       className="form-input"
                     />
                   </div>
+                  <div className="form-field">
+                    <label className="form-label">Mật khẩu hiện tại</label>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'stretch' }}>
+                      <input 
+                        type={showCurrentPassword ? 'text' : 'password'}
+                        className="form-input"
+                        value={showCurrentPassword ? selectedUser?.password || '' : '●●●●●●●●'}
+                        style={{ flex: 1 }}
+                        disabled
+                      />
+                      <button
+                        type="button"
+                        className="btn-icon-eye"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        title={showCurrentPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                        style={{
+                          padding: '8px 12px',
+                          border: '1px solid #cbd5e1',
+                          borderRadius: '8px',
+                          background: '#fff',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#64748b',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="form-field">
+                    <label className="form-label">Mật khẩu mới</label>
+                    <input 
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="Nhập mật khẩu mới (để trống nếu không đổi)" 
+                      className="form-input"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -815,6 +877,10 @@ export default function AdminUserManagementPage() {
                     <span className={`status-dot ${selectedUser.status === 'Hoạt động' ? 'active' : 'locked'}`}></span>
                     {selectedUser.status}
                   </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Mật khẩu:</span>
+                  <span className="info-value">••••••••</span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Ngày đăng ký hệ thống:</span>
