@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   FaSearch, 
   FaBell, 
@@ -6,6 +7,8 @@ import {
 } from 'react-icons/fa';
 
 export default function AdminHeader({ searchQuery, setSearchQuery, showToastMessage }) {
+  const navigate = useNavigate();
+
   return (
     <header className="asm-header">
       <div className="asm-search-container">
@@ -20,7 +23,7 @@ export default function AdminHeader({ searchQuery, setSearchQuery, showToastMess
       </div>
 
       <div className="asm-header-right">
-        <button className="asm-icon-btn" onClick={() => showToastMessage('Bạn không có thông báo mới nào.')}>
+        <button className="asm-icon-btn" onClick={() => navigate('/admin/notifications')}>
           <FaBell />
           <span className="asm-badge" />
         </button>
