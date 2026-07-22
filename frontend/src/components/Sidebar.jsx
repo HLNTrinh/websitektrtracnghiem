@@ -16,19 +16,7 @@ export default function Sidebar() {
                 </div>
             </div>
 
-            {/* User Info */}
-            <div className="sidebar-user">
-                <img
-                    src={user?.avatar || "https://i.pravatar.cc/80?img=12"}
-                    alt="avatar"
-                    className="sidebar-avatar"
-                />
-                <div className="user-info">
-                    <h3>{user?.name || "Nguyễn Hoài Nam"}</h3>
-                    <p>{user?.email || "hocsinh@example.com"}</p>
-                </div>
-            </div>
-
+          
             {/* Navigation */}
             <nav className="sidebar-nav">
                 <NavLink
