@@ -630,6 +630,17 @@ export default function AdminUserManagementPage() {
                       required
                     />
                   </div>
+                  <div className="form-field">
+                    <label className="form-label">Số điện thoại</label>
+                    <input 
+                      type="text" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="Nhập số điện thoại" 
+                      className="form-input"
+                    />
+                  </div>
             
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     <div className="form-field">
