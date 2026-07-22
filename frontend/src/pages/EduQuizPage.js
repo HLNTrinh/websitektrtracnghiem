@@ -1068,29 +1068,6 @@ export default function EduQuizPage() {
             <p className="text-muted" style={{ fontSize: '16px', marginTop: '-32px' }}>Giải pháp tùy chỉnh theo nhu cầu thực tế của từng vai trò</p>
           </div>
           <div className="roles-grid">
-            {/* Admin */}
-            <div className="role-card">
-              <div className="role-card-content">
-                <div className="role-header">
-                  <span className="role-icon"><MdAdminPanelSettings /></span>
-                  <h3>Quản trị viên</h3>
-                </div>
-                <p className="role-description">
-                  Quản lý toàn bộ hệ thống, phân quyền người dùng và kiểm soát dữ liệu vĩ mô của cơ sở giáo dục.
-                </p>
-                <ul className="role-list">
-                  <li className="role-list-item"><FaCheckCircle /> Quản lý tài khoản và lớp học</li>
-                  <li className="role-list-item"><FaCheckCircle /> Cấu hình hệ thống linh hoạt</li>
-                  <li className="role-list-item"><FaCheckCircle /> Báo cáo thống kê tổng hợp</li>
-                </ul>
-              </div>
-              <img 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtqPZSFc_I2iMzKRdLCDl4uAKlD8MAxcjoItYZM7eBb9wAaIAv8mG10RDaIGP6qRBHwdNoissPRis1CBrRvCKkGNPbBG8evK_4WqVWhUf1-dKjIQxWyxAEcrUiPGpY70LOYTy451Wu4IaK-4HIOVsRkq6vVKA2Ic_JqfCIe7eHjzGplrAH6VXMvKl9I2qDBUvg94W0C1Z3CpmGedhUtfvG-ZNIY_KoZcQ8kXL1yKBnXMdnQyI4_5RnjJicqaJHZFJS4tpi5WU3S9wS" 
-                alt="Quản trị viên" 
-                className="role-card-image"
-                referrerPolicy="no-referrer"
-              />
-            </div>
 
             {/* Teacher */}
             <div className="role-card featured-role">
@@ -1217,9 +1194,8 @@ export default function EduQuizPage() {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="eduquiz-container">
-          <div className="cta-card">
-            <div className="cta-glow-1"></div>
-            <div className="cta-glow-2"></div>
+          {/* <div className="cta-card"> */}
+          <div className="eduquiz-cta-card">
             <h2 className="cta-title">Sẵn sàng số hóa quy trình thi cử?</h2>
             <p className="cta-desc">
               Bắt đầu miễn phí ngay hôm nay và trải nghiệm sự tiện lợi của công nghệ giáo dục hàng đầu.
