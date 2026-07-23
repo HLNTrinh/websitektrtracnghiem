@@ -41,17 +41,32 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   // Đăng nhập
-  const login = async (email, password) => {
-    try {
-      const data = await authService.login({ email, password });
-      const currentUser = data?.user || data;
+const login = async (email, password, rememberMe = false) => {
+  try {
+    const data = await authService.login({
+      email,
+      password,
+    });
+
+    const currentUser = data?.user || data;
+
+    if (!rememberMe) {
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("user", JSON.stringify(currentUser));
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } else {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(currentUser));
-      setUser(currentUser);
-      return data;
-    } catch (error) {
-      throw new Error(normalizeAuthError(error));
     }
+
+    setUser(currentUser);
+
+    return data;
+  } catch (error) {
+    throw new Error(normalizeAuthError(error));
+  }
+};
   };
 
   // Đăng ký
