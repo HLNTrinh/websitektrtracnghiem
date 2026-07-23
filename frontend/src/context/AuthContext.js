@@ -67,7 +67,7 @@ const login = async (email, password, rememberMe = false) => {
     throw new Error(normalizeAuthError(error));
   }
 };
-  };
+
 
   // Đăng ký
   const register = async (name, email, password) => {
