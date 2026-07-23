@@ -1,0 +1,3 @@
+.eduquiz-page { min-height: 100vh; }
+.eduquiz-page button, .eduquiz-page input, .eduquiz-page select { font: inherit; }
+.eduquiz-page button { cursor: pointer; }

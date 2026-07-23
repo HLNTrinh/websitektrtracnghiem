@@ -5,12 +5,18 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 // ✅ Tự động đính kèm token vào mỗi request
+const getAuthToken = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token') || sessionStorage.getItem('token');
+};
+
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = getAuthToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -24,9 +30,13 @@ api.interceptors.response.use(
   (response) => response.data,
   (error) => {
     const message = error.response?.data?.message || 'Đã có lỗi xảy ra';
+    const pathname = window.location.pathname;
+    const isAdminRoute = pathname.startsWith('/admin');
+    //const isPublicRoute = ['/login', '/register', '/admin'].includes(pathname);
+    const isPublicRoute = ['/', '/home', '/login', '/register', '/admin'].includes(pathname);
 
-    // Token hết hạn hoặc không hợp lệ → tự động logout
-    if (error.response?.status === 401) {
+    // Token hết hạn hoặc không hợp lệ → chỉ tự động logout cho các route không phải admin/public
+    if (error.response?.status === 401 && !isAdminRoute && !isPublicRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
