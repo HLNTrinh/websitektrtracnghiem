@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminLayout from '../components/admin/AdminLayout';
 import { 
   MdTrendingUp,
@@ -6,96 +6,85 @@ import {
   MdQuiz,
   MdPeople
 } from 'react-icons/md';
+import {
+  getDashboardStats,
+  getChartData,
+  getRoleDistribution,
+  getRecentActivities,
+} from '../services/adminService';
 import '../styles/AdminDashboard.css';
 
 export default function AdminDashboardPage() {
-  // Trạng thái tìm kiếm hoạt động
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // Trạng thái lọc biểu đồ cột (ngày / tuần)
   const [chartPeriod, setChartPeriod] = useState('day');
+  
+  // State lưu dữ liệu từ API
+  const [stats, setStats] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [roleDistribution, setRoleDistribution] = useState(null);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data cho danh sách hoạt động gần đây
-  const mockActivities = [
-    {
-      id: 1,
-      name: 'Lê Minh Tuấn',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&fit=crop&q=80',
-      action: 'Nộp bài thi',
-      badgeClass: 'green',
-      target: 'Kiểm tra Toán 12 - Giải tích',
-      time: '2 phút trước'
-    },
-    {
-      id: 2,
-      name: 'Nguyễn Văn Khải',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&fit=crop&q=80',
-      action: 'Tạo đề thi mới',
-      badgeClass: 'blue',
-      target: 'Ôn tập Vật Lý - Quang học',
-      time: '15 phút trước'
-    },
-    {
-      id: 3,
-      name: 'Trần Thị Mai',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&fit=crop&q=80',
-      action: 'Cập nhật hệ thống',
-      badgeClass: 'warning',
-      target: 'Cài đặt phân quyền lớp 10A2',
-      time: '1 giờ trước'
-    },
-    {
-      id: 4,
-      name: 'Phạm Minh Đức',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&fit=crop&q=80',
-      action: 'Nộp bài thi',
-      badgeClass: 'green',
-      target: 'Đề khảo sát Hoá học 11',
-      time: '2 giờ trước'
-    },
-    {
-      id: 5,
-      name: 'Hoàng Lan Anh',
-      avatar: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&fit=crop&q=80',
-      action: 'Tạo đề thi mới',
-      badgeClass: 'blue',
-      target: 'Kiểm tra học kỳ 2 Tiếng Anh',
-      time: '3 giờ trước'
+  // Fetch tất cả dữ liệu khi component mount
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  // Fetch lại chart data khi đổi period
+  useEffect(() => {
+    fetchChartData();
+  }, [chartPeriod]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      const [statsRes, chartRes, roleRes, activitiesRes] = await Promise.all([
+        getDashboardStats(),
+        getChartData({ period: 'day' }),
+        getRoleDistribution(),
+        getRecentActivities({ limit: 10 }),
+      ]);
+      setStats(statsRes.stats);
+      setChartData(chartRes.chartData || []);
+      setRoleDistribution(roleRes.distribution);
+      setActivities(activitiesRes.activities || []);
+    } catch (error) {
+      console.error('Lỗi tải dữ liệu dashboard:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
-
-  // Dữ liệu biểu đồ cột theo Ngày và Tuần
-  const barChartData = {
-    day: [
-      { label: 'T2', height: '65%', count: '452 bài' },
-      { label: 'T3', height: '45%', count: '312 bài' },
-      { label: 'T4', height: '85%', count: '584 bài' },
-      { label: 'T5', height: '55%', count: '382 bài' },
-      { label: 'T6', height: '95%', count: '674 bài' },
-      { label: 'T7', height: '40%', count: '281 bài' },
-      { label: 'CN', height: '30%', count: '210 bài' }
-    ],
-    week: [
-      { label: 'T2', height: '45%', count: '2,840 bài' },
-      { label: 'T3', height: '65%', count: '3,120 bài' },
-      { label: 'T4', height: '55%', count: '2,900 bài' },
-      { label: 'T5', height: '80%', count: '3,850 bài' },
-      { label: 'T6', height: '70%', count: '3,410 bài' },
-      { label: 'T7', height: '90%', count: '4,200 bài' },
-      { label: 'CN', height: '60%', count: '2,950 bài' }
-    ]
   };
 
-  // Lọc danh sách hoạt động dựa trên từ khóa tìm kiếm
-  const filteredActivities = mockActivities.filter(activity => 
-    activity.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    activity.target.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    activity.action.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const fetchChartData = async () => {
+    try {
+      const res = await getChartData({ period: chartPeriod });
+      setChartData(res.chartData || []);
+    } catch (error) {
+      console.error('Lỗi tải dữ liệu biểu đồ:', error);
+    }
+  };
+
+  // Filter activities
+  const filteredActivities = activities.filter(activity => {
+    const name = activity.user?.name?.toLowerCase() || '';
+    const target = activity.target?.toLowerCase() || '';
+    const action = activity.action?.toLowerCase() || '';
+    const q = searchQuery.toLowerCase();
+    return name.includes(q) || target.includes(q) || action.includes(q);
+  });
+
+  // Tính % lớn nhất trong chart để scale height
+  const maxCount = chartData.length > 0 ? Math.max(...chartData.map(d => d.count)) : 1;
+
+  // Format số
+  const formatNumber = (num) => {
+    if (!num && num !== 0) return '0';
+    if (num >= 1000) return (num / 1000).toFixed(1).replace('.0', '') + 'k';
+    return num.toLocaleString('vi-VN');
+  };
 
   return (
     <AdminLayout pageTitle="Tổng quan hệ thống">
-      {/* Dashboard Body */}
       <div className="db-body">
         
         {/* Stats Metrics Grid */}
@@ -107,7 +96,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="db-stat-content">
               <span className="db-stat-label">Tổng người dùng</span>
-              <h3 className="db-stat-value">12,480</h3>
+              <h3 className="db-stat-value">
+                {loading ? '...' : formatNumber(stats?.totalUsers)}
+              </h3>
             </div>
           </div>
 
@@ -117,7 +108,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="db-stat-content">
               <span className="db-stat-label">Tổng đề thi</span>
-              <h3 className="db-stat-value">3,125</h3>
+              <h3 className="db-stat-value">
+                {loading ? '...' : formatNumber(stats?.totalQuizzes)}
+              </h3>
             </div>
           </div>
 
@@ -127,7 +120,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="db-stat-content">
               <span className="db-stat-label">Bài nộp hôm nay</span>
-              <h3 className="db-stat-value">452</h3>
+              <h3 className="db-stat-value">
+                {loading ? '...' : formatNumber(stats?.todayAttempts)}
+              </h3>
             </div>
           </div>
 
@@ -137,7 +132,9 @@ export default function AdminDashboardPage() {
             </div>
             <div className="db-stat-content">
               <span className="db-stat-label">Bài nộp tuần này</span>
-              <h3 className="db-stat-value">2,840</h3>
+              <h3 className="db-stat-value">
+                {loading ? '...' : formatNumber(stats?.weeklyAttempts)}
+              </h3>
             </div>
           </div>
 
@@ -146,7 +143,7 @@ export default function AdminDashboardPage() {
         {/* Charts Section */}
         <div className="db-charts-grid">
           
-          {/* Bar Chart - Column Chart */}
+          {/* Bar Chart */}
           <div className="db-chart-card col-span-2">
             <div className="db-chart-header">
               <div className="db-chart-title-wrapper">
@@ -170,19 +167,28 @@ export default function AdminDashboardPage() {
             </div>
 
             <div className="db-bar-chart-container">
-              {barChartData[chartPeriod].map((bar, index) => (
-                <div key={index} className="db-bar-column">
-                  <div className="db-bar-track">
-                    <div 
-                      className="db-bar-fill" 
-                      style={{ height: bar.height }}
-                    >
-                      <span className="db-bar-tooltip">{bar.count}</span>
+              {chartData.length > 0 ? (
+                chartData.map((bar, index) => {
+                  const heightPercent = maxCount > 0 ? (bar.count / maxCount) * 100 : 0;
+                  return (
+                    <div key={index} className="db-bar-column">
+                      <div className="db-bar-track">
+                        <div 
+                          className="db-bar-fill" 
+                          style={{ height: `${Math.max(heightPercent, 5)}%` }}
+                        >
+                          <span className="db-bar-tooltip">{bar.count} bài</span>
+                        </div>
+                      </div>
+                      <span className="db-bar-label">{bar.label}</span>
                     </div>
-                  </div>
-                  <span className="db-bar-label">{bar.label}</span>
+                  );
+                })
+              ) : (
+                <div style={{ textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                  {loading ? 'Đang tải...' : 'Chưa có dữ liệu bài thi'}
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
@@ -199,36 +205,44 @@ export default function AdminDashboardPage() {
                   r="70" 
                   className="db-donut-circle-bg"
                 />
-                {/* Blue segment: 70% of 439.8 = 308 */}
-                <circle 
-                  cx="90" 
-                  cy="90" 
-                  r="70" 
-                  className="db-donut-circle blue"
-                  strokeDasharray="308 440"
-                  strokeDashoffset="0"
-                />
-                {/* Green segment: 25% of 439.8 = 110 */}
-                <circle 
-                  cx="90" 
-                  cy="90" 
-                  r="70" 
-                  className="db-donut-circle green"
-                  strokeDasharray="110 440"
-                  strokeDashoffset="-308"
-                />
-                {/* Warning (Amber) segment: 5% of 439.8 = 22 */}
-                <circle 
-                  cx="90" 
-                  cy="90" 
-                  r="70" 
-                  className="db-donut-circle warning"
-                  strokeDasharray="22 440"
-                  strokeDashoffset="-418"
-                />
+                {roleDistribution && roleDistribution.total > 0 ? (
+                  <>
+                    {/* Student segment */}
+                    <circle 
+                      cx="90" 
+                      cy="90" 
+                      r="70" 
+                      className="db-donut-circle blue"
+                      strokeDasharray={`${(roleDistribution.percentages.students / 100) * 440} 440`}
+                      strokeDashoffset="0"
+                    />
+                    {/* Teacher segment */}
+                    <circle 
+                      cx="90" 
+                      cy="90" 
+                      r="70" 
+                      className="db-donut-circle green"
+                      strokeDasharray={`${(roleDistribution.percentages.teachers / 100) * 440} 440`}
+                      strokeDashoffset={`${-((roleDistribution.percentages.students / 100) * 440)}`}
+                    />
+                    {/* Admin segment */}
+                    <circle 
+                      cx="90" 
+                      cy="90" 
+                      r="70" 
+                      className="db-donut-circle warning"
+                      strokeDasharray={`${(roleDistribution.percentages.admins / 100) * 440} 440`}
+                      strokeDashoffset={`${-((roleDistribution.percentages.students + roleDistribution.percentages.teachers) / 100 * 440)}`}
+                    />
+                  </>
+                ) : (
+                  <circle cx="90" cy="90" r="70" className="db-donut-circle-bg" />
+                )}
               </svg>
               <div className="db-donut-center-text">
-                <span className="db-donut-number">12.4k</span>
+                <span className="db-donut-number">
+                  {loading ? '...' : formatNumber(roleDistribution?.total)}
+                </span>
                 <span className="db-donut-label">Tổng số</span>
               </div>
             </div>
@@ -239,21 +253,27 @@ export default function AdminDashboardPage() {
                   <div className="db-legend-dot warning"></div>
                   <span className="db-legend-name">Quản trị viên</span>
                 </div>
-                <span className="db-legend-percentage">5%</span>
+                <span className="db-legend-percentage">
+                  {loading ? '...' : (roleDistribution?.percentages?.admins || 0) + '%'}
+                </span>
               </div>
               <div className="db-legend-item">
                 <div className="db-legend-left">
                   <div className="db-legend-dot green"></div>
                   <span className="db-legend-name">Giáo viên</span>
                 </div>
-                <span className="db-legend-percentage">25%</span>
+                <span className="db-legend-percentage">
+                  {loading ? '...' : (roleDistribution?.percentages?.teachers || 0) + '%'}
+                </span>
               </div>
               <div className="db-legend-item">
                 <div className="db-legend-left">
                   <div className="db-legend-dot blue"></div>
                   <span className="db-legend-name">Học sinh</span>
                 </div>
-                <span className="db-legend-percentage">70%</span>
+                <span className="db-legend-percentage">
+                  {loading ? '...' : (roleDistribution?.percentages?.students || 0) + '%'}
+                </span>
               </div>
             </div>
           </div>
@@ -264,7 +284,7 @@ export default function AdminDashboardPage() {
         <div className="db-activity-section">
           <div className="db-activity-header">
             <h4 className="db-activity-title">Hoạt động gần đây</h4>
-            <button className="db-view-all-btn" onClick={() => alert('Đang tải tất cả các hoạt động...')}>
+            <button className="db-view-all-btn">
               Xem tất cả
             </button>
           </div>
@@ -280,32 +300,52 @@ export default function AdminDashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredActivities.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center', padding: '32px', color: 'var(--db-text-muted)' }}>
+                      Đang tải dữ liệu...
+                    </td>
+                  </tr>
+                ) : filteredActivities.length > 0 ? (
                   filteredActivities.map((activity) => (
                     <tr key={activity.id}>
                       <td>
                         <div className="db-user-cell">
-                          <img 
-                            className="db-user-avatar" 
-                            src={activity.avatar} 
-                            alt={activity.name} 
-                          />
-                          <span className="db-user-name">{activity.name}</span>
+                          {activity.user?.avatar ? (
+                            <img 
+                              className="db-user-avatar" 
+                              src={activity.user.avatar} 
+                              alt={activity.user.name} 
+                            />
+                          ) : (
+                            <div className="db-user-avatar" style={{ 
+                              background: '#e2e8f0', 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'center',
+                              fontSize: '14px',
+                              fontWeight: 600,
+                              color: '#64748b'
+                            }}>
+                              {activity.user?.name?.charAt(0) || '?'}
+                            </div>
+                          )}
+                          <span className="db-user-name">{activity.user?.name || 'Người dùng'}</span>
                         </div>
                       </td>
                       <td>
-                        <span className={`db-badge ${activity.badgeClass}`}>
+                        <span className="db-badge green">
                           {activity.action}
                         </span>
                       </td>
                       <td>{activity.target}</td>
-                      <td className="db-time-cell">{activity.time}</td>
+                      <td className="db-time-cell">{activity.timeAgo}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
                     <td colSpan="4" style={{ textAlign: 'center', padding: '32px', color: 'var(--db-text-muted)' }}>
-                      Không tìm thấy kết quả phù hợp
+                      Không có hoạt động nào gần đây
                     </td>
                   </tr>
                 )}
