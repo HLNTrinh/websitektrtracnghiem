@@ -17,24 +17,21 @@ import {
   MdClose,
   MdSchool
 } from 'react-icons/md';
+import {
+  getSubjects,
+  createSubject,
+  updateSubject,
+  deleteSubject,
+} from '../services/adminService';
 import '../styles/AdminSubjectManagement.css';
-
-const defaultSubjects = [
-  { id: 1, code: 'MATH101', name: 'Toán giải tích', department: 'Khoa học tự nhiên', examsCount: 12, status: 'Đang hoạt động', updatedAt: '2 giờ trước' },
-  { id: 2, code: 'PHYS102', name: 'Vật lý đại cương', department: 'Khoa học tự nhiên', examsCount: 8, status: 'Đang hoạt động', updatedAt: 'Hôm qua' },
-  { id: 3, code: 'CHEM201', name: 'Hóa học hữu cơ', department: 'Khoa học tự nhiên', examsCount: 15, status: 'Tạm dừng', updatedAt: '3 ngày trước' },
-  { id: 4, code: 'ENGL001', name: 'Tiếng Anh giao tiếp', department: 'Ngôn ngữ', examsCount: 24, status: 'Đang hoạt động', updatedAt: 'Tuần trước' },
-  { id: 5, code: 'COMP102', name: 'Lập trình hướng đối tượng', department: 'Kỹ thuật & Công nghệ', examsCount: 18, status: 'Đang hoạt động', updatedAt: '3 ngày trước' },
-  { id: 6, code: 'ECON101', name: 'Kinh tế vĩ mô', department: 'Kinh tế & Quản lý', examsCount: 10, status: 'Tạm dừng', updatedAt: '5 ngày trước' },
-  { id: 7, code: 'HIST101', name: 'Lịch sử văn minh thế giới', department: 'Khoa học xã hội', examsCount: 6, status: 'Đang hoạt động', updatedAt: '1 tuần trước' },
-  { id: 8, code: 'MKT201', name: 'Nguyên lý Marketing', department: 'Kinh tế & Quản lý', examsCount: 14, status: 'Đang hoạt động', updatedAt: 'Hôm nay' }
-];
 
 export default function AdminSubjectManagementPage() {
   // State managers
-  const [subjects, setSubjects] = useState(defaultSubjects);
+  const [subjects, setSubjects] = useState([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDept, setSelectedDept] = useState('Tất cả khoa/ngành');
+  const [selectedDept, setSelectedDept] = useState('all');
+  const [loading, setLoading] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,14 +43,14 @@ export default function AdminSubjectManagementPage() {
   const [showViewModal, setShowViewModal] = useState(false);
   
   // Form State
-  const [modalType, setModalType] = useState('add'); // 'add' or 'edit'
+  const [modalType, setModalType] = useState('add');
   const [currentSubject, setCurrentSubject] = useState(null);
   const [formValues, setFormValues] = useState({
     code: '',
     name: '',
     department: 'Khoa học tự nhiên',
     examsCount: 0,
-    status: 'Đang hoạt động'
+    status: 'active'
   });
 
   // Notification Toast States
@@ -62,45 +59,72 @@ export default function AdminSubjectManagementPage() {
   // Auto-hide Toast
   useEffect(() => {
     if (toast) {
-      const timer = setTimeout(() => {
-        setToast(null);
-      }, 4000);
+      const timer = setTimeout(() => setToast(null), 4000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
 
-  // Show customized toast helper
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
 
-  // Extract unique departments for dropdown
-  const departments = ['Tất cả khoa/ngành', ...new Set(subjects.map(s => s.department))];
+  // Lấy danh sách departments từ subjects
+  const departments = ['all', ...new Set(subjects.map(s => s.department))];
 
-  // Filtering subjects list
-  const filteredSubjects = subjects.filter(subject => {
-    const matchesSearch = 
-      subject.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      subject.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDept = 
-      selectedDept === 'Tất cả khoa/ngành' || 
-      subject.department === selectedDept;
-    return matchesSearch && matchesDept;
-  });
+  // Fetch subjects từ API
+  const fetchSubjects = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery,
+        department: selectedDept,
+      };
+      const res = await getSubjects(params);
+      setSubjects(res.subjects || []);
+      setTotalItems(res.total || 0);
+    } catch (error) {
+      showToast('Lỗi tải danh sách môn học', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Calculate paginated elements
-  const totalItems = filteredSubjects.length;
+  useEffect(() => {
+    fetchSubjects();
+  }, [currentPage, selectedDept]);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+      fetchSubjects();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedDept]);
+
+  // Tính toán phân trang
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
-  const currentItems = filteredSubjects.slice(startIndex, startIndex + itemsPerPage);
 
-  // Reset page when search or filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, selectedDept]);
+  // Map status
+  const mapStatusToUI = (status) => {
+    const map = { active: 'Đang hoạt động', inactive: 'Tạm dừng' };
+    return map[status] || status;
+  };
 
-  // Handle Input Changes in Add/Edit form
+  const mapStatusToAPI = (statusUI) => {
+    const map = { 'Đang hoạt động': 'active', 'Tạm dừng': 'inactive' };
+    return map[statusUI] || statusUI;
+  };
+
+  // Handle Input Changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues(prev => ({
@@ -109,7 +133,7 @@ export default function AdminSubjectManagementPage() {
     }));
   };
 
-  // Open Modal Helpers
+  // Open Modal
   const openAddModal = () => {
     setModalType('add');
     setFormValues({
@@ -117,7 +141,7 @@ export default function AdminSubjectManagementPage() {
       name: '',
       department: 'Khoa học tự nhiên',
       examsCount: 0,
-      status: 'Đang hoạt động'
+      status: 'active'
     });
     setShowAddEditModal(true);
   };
@@ -129,7 +153,7 @@ export default function AdminSubjectManagementPage() {
       code: subject.code,
       name: subject.name,
       department: subject.department,
-      examsCount: subject.examsCount,
+      examsCount: subject.examsCount || 0,
       status: subject.status
     });
     setShowAddEditModal(true);
@@ -146,64 +170,60 @@ export default function AdminSubjectManagementPage() {
   };
 
   // Submit operations
-  const handleSaveSubject = (e) => {
+  const handleSaveSubject = async (e) => {
     e.preventDefault();
     if (!formValues.code.trim() || !formValues.name.trim()) {
       showToast('Vui lòng điền đầy đủ mã môn và tên môn học!', 'error');
       return;
     }
 
-    if (modalType === 'add') {
-      // Check duplicate code
-      if (subjects.some(s => s.code.toUpperCase() === formValues.code.toUpperCase())) {
-        showToast('Mã môn học này đã tồn tại trên hệ thống!', 'error');
-        return;
+    try {
+      if (modalType === 'add') {
+        await createSubject({
+          code: formValues.code,
+          name: formValues.name,
+          department: formValues.department,
+          examsCount: formValues.examsCount,
+          status: formValues.status,
+        });
+        showToast(`Đã thêm môn học "${formValues.name}" thành công!`, 'success');
+      } else {
+        await updateSubject(currentSubject._id, {
+          code: formValues.code,
+          name: formValues.name,
+          department: formValues.department,
+          examsCount: formValues.examsCount,
+          status: formValues.status,
+        });
+        showToast(`Cập nhật môn học "${formValues.name}" thành công!`, 'success');
       }
-
-      const newSubject = {
-        id: subjects.length ? Math.max(...subjects.map(s => s.id)) + 1 : 1,
-        code: formValues.code.toUpperCase(),
-        name: formValues.name,
-        department: formValues.department,
-        examsCount: formValues.examsCount,
-        status: formValues.status,
-        updatedAt: 'Vừa xong'
-      };
-
-      setSubjects([newSubject, ...subjects]);
-      showToast(`Đã thêm môn học "${newSubject.name}" thành công!`, 'success');
-    } else {
-      // Edit operation
-      setSubjects(prev => prev.map(s => s.id === currentSubject.id ? {
-        ...s,
-        code: formValues.code.toUpperCase(),
-        name: formValues.name,
-        department: formValues.department,
-        examsCount: formValues.examsCount,
-        status: formValues.status,
-        updatedAt: 'Vừa cập nhật'
-      } : s));
-      showToast(`Cập nhật môn học "${formValues.name}" thành công!`, 'success');
+      setShowAddEditModal(false);
+      fetchSubjects();
+    } catch (error) {
+      showToast(error.message || 'Lỗi khi lưu môn học', 'error');
     }
-
-    setShowAddEditModal(false);
   };
 
-  const handleDeleteSubject = () => {
-    setSubjects(prev => prev.filter(s => s.id !== currentSubject.id));
-    showToast(`Đã xóa môn học "${currentSubject.name}" khỏi hệ thống!`, 'info');
-    setShowDeleteModal(false);
+  const handleDeleteSubject = async () => {
+    try {
+      await deleteSubject(currentSubject._id);
+      showToast(`Đã xóa môn học "${currentSubject.name}" khỏi hệ thống!`, 'info');
+      setShowDeleteModal(false);
+      fetchSubjects();
+    } catch (error) {
+      showToast(error.message || 'Lỗi khi xóa môn học', 'error');
+    }
   };
 
-  // Stat summary calculations
-  const totalCount = subjects.length;
-  const activeCount = subjects.filter(s => s.status === 'Đang hoạt động').length;
-  const pausedCount = subjects.filter(s => s.status === 'Tạm dừng').length;
+  // Stat summary
+  const totalCount = totalItems;
+  const activeCount = subjects.filter(s => s.status === 'active').length;
+  const pausedCount = subjects.filter(s => s.status === 'inactive').length;
   const deptCount = [...new Set(subjects.map(s => s.department))].length;
 
   return (
     <AdminLayout pageTitle="Quản lý môn học" pageSubtitle="Danh sách và quản lý các môn học hiện có trong hệ thống.">
-      {/* Toast alert notifications */}
+      {/* Toast */}
       {toast && (
         <div className="toast-container" id="toastContainer">
           <div className={`toast ${toast.type}`}>
@@ -217,9 +237,8 @@ export default function AdminSubjectManagementPage() {
         </div>
       )}
 
-      {/* Page Content Dashboard */}
       <div className="page-view">
-        {/* Bento Stats Summary Layout */}
+        {/* Stats */}
         <div className="bento-stats" id="bentoStats">
           <div className="stat-card">
             <div className="stat-icon-wrapper blue">
@@ -227,7 +246,7 @@ export default function AdminSubjectManagementPage() {
             </div>
             <div className="stat-info">
               <p>Tổng môn học</p>
-              <h3>{totalCount < 10 ? `0${totalCount}` : totalCount}</h3>
+              <h3>{loading ? '...' : (totalCount < 10 ? `0${totalCount}` : totalCount)}</h3>
             </div>
           </div>
 
@@ -237,7 +256,7 @@ export default function AdminSubjectManagementPage() {
             </div>
             <div className="stat-info">
               <p>Đang hoạt động</p>
-              <h3>{activeCount < 10 ? `0${activeCount}` : activeCount}</h3>
+              <h3>{loading ? '...' : (activeCount < 10 ? `0${activeCount}` : activeCount)}</h3>
             </div>
           </div>
 
@@ -247,7 +266,7 @@ export default function AdminSubjectManagementPage() {
             </div>
             <div className="stat-info">
               <p>Tạm dừng</p>
-              <h3>{pausedCount < 10 ? `0${pausedCount}` : pausedCount}</h3>
+              <h3>{loading ? '...' : (pausedCount < 10 ? `0${pausedCount}` : pausedCount)}</h3>
             </div>
           </div>
 
@@ -257,12 +276,12 @@ export default function AdminSubjectManagementPage() {
             </div>
             <div className="stat-info">
               <p>Số khoa/ngành</p>
-              <h3>{deptCount < 10 ? `0${deptCount}` : deptCount}</h3>
+              <h3>{loading ? '...' : (deptCount < 10 ? `0${deptCount}` : deptCount)}</h3>
             </div>
           </div>
         </div>
 
-        {/* Search Filters Card Wrapper */}
+        {/* Filters */}
         <div className="filters-container" id="filtersContainer">
           <div className="filter-search-box">
             <MdSearch className="filter-search-icon" />
@@ -281,15 +300,10 @@ export default function AdminSubjectManagementPage() {
               onChange={(e) => setSelectedDept(e.target.value)}
             >
               {departments.map((dept, idx) => (
-                <option key={idx} value={dept}>{dept}</option>
+                <option key={idx} value={dept}>{dept === 'all' ? 'Tất cả khoa/ngành' : dept}</option>
               ))}
             </select>
 
-            <button className="btn-secondary" onClick={() => showToast('Đã áp dụng các bộ lọc tìm kiếm!', 'info')}>
-              <MdFilterList className="btn-secondary-icon" />
-              <span>Lọc</span>
-            </button>
-            
             <button className="btn-primary" onClick={openAddModal} id="btnAddSubject">
               <MdAddCircle className="btn-primary-icon" />
               <span>Thêm môn học mới</span>
@@ -297,7 +311,7 @@ export default function AdminSubjectManagementPage() {
           </div>
         </div>
 
-        {/* Table Card Section */}
+        {/* Table */}
         <div className="table-card" id="tableCard">
           <div className="table-responsive">
             <table className="subjects-table">
@@ -312,16 +326,24 @@ export default function AdminSubjectManagementPage() {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.length > 0 ? (
-                  currentItems.map((subject) => (
-                    <tr key={subject.id}>
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
+                      Đang tải dữ liệu...
+                    </td>
+                  </tr>
+                ) : subjects.length > 0 ? (
+                  subjects.map((subject) => (
+                    <tr key={subject._id}>
                       <td>
                         <span className="subject-code-badge">{subject.code}</span>
                       </td>
                       <td>
                         <div className="subject-name-cell">
                           <span className="subject-name">{subject.name}</span>
-                          <span className="subject-update-time">Cập nhật: {subject.updatedAt}</span>
+                          <span className="subject-update-time">
+                            Cập nhật: {subject.updatedAt ? new Date(subject.updatedAt).toLocaleDateString('vi-VN') : '---'}
+                          </span>
                         </div>
                       </td>
                       <td>
@@ -330,38 +352,29 @@ export default function AdminSubjectManagementPage() {
                       <td>
                         <div className="exams-count-badge">
                           <span className="exams-count-num">
-                            {subject.examsCount < 10 ? `0${subject.examsCount}` : subject.examsCount}
+                            {(subject.examsCount || 0) < 10 ? `0${subject.examsCount || 0}` : subject.examsCount}
                           </span>
                           <span className="exams-set-label">Bộ đề</span>
                         </div>
                       </td>
                       <td>
-                        <span className={`status-badge ${subject.status === 'Đang hoạt động' ? 'active' : 'paused'}`}>
+                        <span className={`status-badge ${subject.status === 'active' ? 'active' : 'paused'}`}>
                           <span className="status-dot"></span>
-                          {subject.status}
+                          {mapStatusToUI(subject.status)}
                         </span>
                       </td>
                       <td>
                         <div className="actions-cell-wrapper">
-                          <button 
-                            className="action-icon-btn view" 
-                            title="Xem chi tiết" 
-                            onClick={() => openViewModal(subject)}
-                          >
+                          <button className="action-icon-btn view" title="Xem chi tiết"
+                            onClick={() => openViewModal(subject)}>
                             <MdVisibility />
                           </button>
-                          <button 
-                            className="action-icon-btn edit" 
-                            title="Chỉnh sửa" 
-                            onClick={() => openEditModal(subject)}
-                          >
+                          <button className="action-icon-btn edit" title="Chỉnh sửa"
+                            onClick={() => openEditModal(subject)}>
                             <MdEdit />
                           </button>
-                          <button 
-                            className="action-icon-btn delete" 
-                            title="Xóa" 
-                            onClick={() => openDeleteModal(subject)}
-                          >
+                          <button className="action-icon-btn delete" title="Xóa"
+                            onClick={() => openDeleteModal(subject)}>
                             <MdDelete />
                           </button>
                         </div>
@@ -379,40 +392,34 @@ export default function AdminSubjectManagementPage() {
             </table>
           </div>
 
-          {/* Pagination Controls Footer */}
+          {/* Pagination */}
           {totalItems > 0 && (
             <div className="pagination-section">
               <p className="pagination-text">
                 Hiển thị <span className="pagination-highlight">{startIndex + 1} - {endIndex}</span> trên tổng số <span className="pagination-highlight">{totalItems}</span> môn học
               </p>
               <div className="pagination-controls">
-                <button 
-                  className="pagination-nav-btn" 
+                <button className="pagination-nav-btn" 
                   onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  title="Trang trước"
-                >
+                  title="Trang trước">
                   <MdChevronLeft />
                 </button>
 
                 <div className="pagination-pages">
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button 
-                      key={page} 
+                    <button key={page} 
                       className={`page-number-btn ${currentPage === page ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(page)}
-                    >
+                      onClick={() => setCurrentPage(page)}>
                       {page}
                     </button>
                   ))}
                 </div>
 
-                <button 
-                  className="pagination-nav-btn" 
+                <button className="pagination-nav-btn"
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  title="Trang sau"
-                >
+                  title="Trang sau">
                   <MdChevronRight />
                 </button>
               </div>
@@ -420,7 +427,7 @@ export default function AdminSubjectManagementPage() {
           )}
         </div>
 
-        {/* Dynamic Bottom Box / Illustration */}
+        {/* Footer */}
         <div className="decorative-empty-state">
           <div className="empty-icon-circle">
             <MdSchool />
@@ -432,7 +439,7 @@ export default function AdminSubjectManagementPage() {
         </div>
       </div>
 
-      {/* Modal: ADD / EDIT SUBJECT */}
+      {/* Add/Edit Modal */}
       {showAddEditModal && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -447,39 +454,17 @@ export default function AdminSubjectManagementPage() {
                 <div className="modal-form">
                   <div className="form-group">
                     <label htmlFor="code">Mã môn học</label>
-                    <input 
-                      type="text" 
-                      id="code" 
-                      name="code" 
-                      placeholder="VD: MATH101, PHYS102" 
-                      value={formValues.code}
-                      onChange={handleInputChange}
-                      required
-                      disabled={modalType === 'edit'}
-                    />
+                    <input type="text" id="code" name="code" placeholder="VD: MATH101, PHYS102"
+                      value={formValues.code} onChange={handleInputChange} required />
                   </div>
-
                   <div className="form-group">
                     <label htmlFor="name">Tên môn học</label>
-                    <input 
-                      type="text" 
-                      id="name" 
-                      name="name" 
-                      placeholder="Nhập tên môn học..." 
-                      value={formValues.name}
-                      onChange={handleInputChange}
-                      required
-                    />
+                    <input type="text" id="name" name="name" placeholder="Nhập tên môn học..."
+                      value={formValues.name} onChange={handleInputChange} required />
                   </div>
-
                   <div className="form-group">
                     <label htmlFor="department">Khoa / Ngành đào tạo</label>
-                    <select 
-                      id="department" 
-                      name="department" 
-                      value={formValues.department}
-                      onChange={handleInputChange}
-                    >
+                    <select id="department" name="department" value={formValues.department} onChange={handleInputChange}>
                       <option value="Khoa học tự nhiên">Khoa học tự nhiên</option>
                       <option value="Ngôn ngữ">Ngôn ngữ</option>
                       <option value="Kỹ thuật & Công nghệ">Kỹ thuật & Công nghệ</option>
@@ -487,30 +472,17 @@ export default function AdminSubjectManagementPage() {
                       <option value="Khoa học xã hội">Khoa học xã hội</option>
                     </select>
                   </div>
-
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="examsCount">Số lượng bộ đề</label>
-                      <input 
-                        type="number" 
-                        id="examsCount" 
-                        name="examsCount" 
-                        min="0"
-                        value={formValues.examsCount}
-                        onChange={handleInputChange}
-                      />
+                      <input type="number" id="examsCount" name="examsCount" min="0"
+                        value={formValues.examsCount} onChange={handleInputChange} />
                     </div>
-
                     <div className="form-group">
                       <label htmlFor="status">Trạng thái hoạt động</label>
-                      <select 
-                        id="status" 
-                        name="status" 
-                        value={formValues.status}
-                        onChange={handleInputChange}
-                      >
-                        <option value="Đang hoạt động">Đang hoạt động</option>
-                        <option value="Tạm dừng">Tạm dừng</option>
+                      <select id="status" name="status" value={formValues.status} onChange={handleInputChange}>
+                        <option value="active">Đang hoạt động</option>
+                        <option value="inactive">Tạm dừng</option>
                       </select>
                     </div>
                   </div>
@@ -525,7 +497,7 @@ export default function AdminSubjectManagementPage() {
         </div>
       )}
 
-      {/* Modal: VIEW SUBJECT DETAILS */}
+      {/* View Modal */}
       {showViewModal && currentSubject && (
         <div className="modal-overlay">
           <div className="modal-container">
@@ -541,35 +513,32 @@ export default function AdminSubjectManagementPage() {
                   <span className="view-detail-label">Mã môn học</span>
                   <span className="view-detail-value code">{currentSubject.code}</span>
                 </div>
-
                 <div className="view-detail-item">
                   <span className="view-detail-label">Tên môn học</span>
                   <span className="view-detail-value">{currentSubject.name}</span>
                 </div>
-
                 <div className="view-detail-item">
                   <span className="view-detail-label">Khoa / Ngành</span>
                   <span className="view-detail-value">{currentSubject.department}</span>
                 </div>
-
                 <div className="view-detail-item">
                   <span className="view-detail-label">Số lượng đề thi</span>
-                  <span className="view-detail-value">{currentSubject.examsCount} bộ đề</span>
+                  <span className="view-detail-value">{currentSubject.examsCount || 0} bộ đề</span>
                 </div>
-
                 <div className="view-detail-item">
                   <span className="view-detail-label">Trạng thái</span>
                   <span className="view-detail-value">
-                    <span className={`status-badge ${currentSubject.status === 'Đang hoạt động' ? 'active' : 'paused'}`}>
+                    <span className={`status-badge ${currentSubject.status === 'active' ? 'active' : 'paused'}`}>
                       <span className="status-dot"></span>
-                      {currentSubject.status}
+                      {mapStatusToUI(currentSubject.status)}
                     </span>
                   </span>
                 </div>
-
                 <div className="view-detail-item">
                   <span className="view-detail-label">Cập nhật lần cuối</span>
-                  <span className="view-detail-value">{currentSubject.updatedAt}</span>
+                  <span className="view-detail-value">
+                    {currentSubject.updatedAt ? new Date(currentSubject.updatedAt).toLocaleDateString('vi-VN') : '---'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -580,7 +549,7 @@ export default function AdminSubjectManagementPage() {
         </div>
       )}
 
-      {/* Modal: DELETE SUBJECT CONFIRMATION */}
+      {/* Delete Modal */}
       {showDeleteModal && currentSubject && (
         <div className="modal-overlay">
           <div className="modal-container">
