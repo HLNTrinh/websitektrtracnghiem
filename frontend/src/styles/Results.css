@@ -28,7 +28,7 @@
 .icon-btn:hover { background: #f4f6fb; }
 .nav-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; }
 
-.results-body { padding: 28px 40px 60px; }
+.results-body { padding: 28px 0 60px; }
 
 .results-head {
   display: flex;
