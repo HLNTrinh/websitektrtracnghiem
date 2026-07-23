@@ -4,8 +4,8 @@
   --exam-ink: #16233b;
   --exam-muted: #71809a;
   --exam-line: #e5ebf5;
-  --exam-surface: #ffffff;
-  --exam-background: #f6f8fc;
+  --exam-surface: #fbfcff;
+  --exam-background: #f3f6fb;
   --exam-soft-blue: #edf4ff;
   --exam-shadow: 0 8px 24px rgba(42, 69, 112, 0.07);
 }
@@ -42,7 +42,7 @@
   display: flex;
   flex-direction: column;
   padding: 22px 14px 18px;
-  background: var(--exam-surface);
+  background: #eef4ff;
   border-right: 1px solid var(--exam-line);
 }
 
@@ -132,7 +132,7 @@
   padding: 22px 30px 44px;
   overflow: hidden;
 }
-
+/*
 .dash-shell .dash-header--overview {
   min-height: 66px;
   display: flex;
@@ -141,7 +141,165 @@
   gap: 24px;
   margin-bottom: 18px;
 }
+*/
+/* =========================================================
+   HEADER TẠO ĐỀ THI
+   ========================================================= */
 
+.dash-header--overview {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    min-height: 180px;
+
+    padding: 30px 34px;
+
+    margin-bottom: 28px;
+
+    overflow: hidden;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #eef4ff 0%,
+            #f8faff 55%,
+            #ffffff 100%
+        );
+
+    border: 1px solid #dbe7fb;
+
+    box-shadow:
+        0 10px 28px rgba(37, 99, 235, 0.08);
+
+    box-sizing: border-box;
+}
+/* =========================================================
+   DECORATION
+   ========================================================= */
+
+.header-decoration {
+    position: absolute;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+.header-decoration--one {
+    width: 230px;
+    height: 230px;
+
+    right: 160px;
+    top: -130px;
+
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.header-decoration--two {
+    width: 150px;
+    height: 150px;
+
+    right: 20px;
+    bottom: -90px;
+
+    background: rgba(37, 99, 235, 0.07);
+}
+/* =========================================================
+   HEADER CONTENT
+   ========================================================= */
+
+.quiz-header-content {
+    position: relative;
+
+    z-index: 1;
+}
+/* =========================================================
+   BADGE
+   ========================================================= */
+
+.overview-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin: 0 0 10px;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background: #dbeafe;
+
+    color: #2563eb;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.5px;
+}
+
+.overview-badge-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+}
+/* =========================================================
+   TITLE
+   ========================================================= */
+
+.dash-header--overview .dash-greeting {
+    margin: 0 0 8px;
+
+    color: #172033;
+
+    font-size: 32px;
+
+    line-height: 1.2;
+
+    font-weight: 800;
+
+    letter-spacing: -0.8px;
+}
+/* =========================================================
+   SUBTITLE
+   ========================================================= */
+
+.dash-header--overview .dash-subtitle {
+    margin: 0;
+
+    max-width: 520px;
+
+    color: #6f7c91;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.button-icon {
+    font-size: 15px;
+
+    transition:
+        transform 0.25s ease;
+}
+
+.btn-outline:hover .button-icon,
+.btn-start:hover .button-icon {
+    transform: scale(1.15);
+}
 .dash-shell .overview-badge {
   margin: 0 0 6px;
   color: #8090aa;

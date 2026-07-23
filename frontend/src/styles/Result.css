@@ -27,12 +27,12 @@
   border-right: 1px solid var(--result-line);
   background: #fff;
 }
-
+/*
 .result-sidebar-brand {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 0 10px 28px;
+  padding: 0 10px 12px;
 }
 
 .result-sidebar-logo {
@@ -46,7 +46,37 @@
   font-size: 15px;
   box-shadow: 0 4px 10px rgba(40, 103, 223, 0.2);
 }
+*/
+/*Logo*/
+.sidebar-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 
+  padding: 0 10px;
+
+  margin-bottom: 10px;
+}
+
+.sidebar-logo svg {
+  width: 170px;
+  height: 48px;
+  display: block;
+}
+
+.sidebar-subtitle {
+  display: block;
+
+  margin-top: -4px;
+  margin-left: 43px;
+
+  color: #93a0b4;
+
+  font-size: 8px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
 .result-sidebar-brand-name,
 .result-sidebar-brand-sub {
   margin: 0;
@@ -623,4 +653,107 @@
   .result-actions .btn {
     width: 100%;
   }
+}
+
+
+/* =========================================================
+   SIDEBAR MENU
+   ========================================================= */
+
+.result-sidebar-nav,
+.result-sidebar-bottom {
+  display: grid;
+  gap: 5px;
+}
+
+
+/* MENU ITEM */
+
+.result-sidebar-nav a,
+.result-sidebar-bottom a {
+  min-height: 37px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+
+  padding: 0 11px;
+
+  border-radius: 8px;
+
+  color: #5e6d85;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  /* Hiệu ứng chuyển động */
+  transition:
+    transform 0.25s ease,
+    color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+
+/* =========================================================
+   HOVER - MENU NỔI LÊN VÀ CÓ MÀU
+   ========================================================= */
+
+.result-sidebar-nav a:hover,
+.result-sidebar-bottom a:hover {
+  transform: translateY(-3px);
+
+  color: #2563eb;
+
+  background: linear-gradient(
+    135deg,
+    #eff6ff,
+    #dbeafe
+  );
+
+  box-shadow:
+    0 7px 16px rgba(37, 99, 235, 0.18);
+}
+
+
+/* =========================================================
+   MENU ĐANG ĐƯỢC CHỌN
+   ========================================================= */
+
+.result-sidebar-nav a.active {
+  color: #2563eb;
+
+  background: #edf4ff;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   ICON
+   ========================================================= */
+
+.result-sidebar-nav a span,
+.result-sidebar-bottom a span {
+  width: 16px;
+
+  display: inline-flex;
+
+  justify-content: center;
+
+  font-size: 13px;
+
+  transition:
+    transform 0.25s ease;
+}
+
+
+/* Icon cũng hơi phóng to khi hover */
+
+.result-sidebar-nav a:hover span,
+.result-sidebar-bottom a:hover span {
+  transform: scale(1.15);
 }

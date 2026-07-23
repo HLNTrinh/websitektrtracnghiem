@@ -3,13 +3,13 @@
    ========================================================= */
 
 :root {
-    --teacher-bg: #f5f7fc;
-    --teacher-card: #ffffff;
+    --teacher-bg: #f3f6fb;
+    --teacher-card: #fbfcff;
     --teacher-primary: #2563eb;
     --teacher-primary-light: #eef4ff;
     --teacher-text: #172033;
     --teacher-muted: #8b95a7;
-    --teacher-border: #edf0f5;
+    --teacher-border: #e2e9f4;
 }
 /* =========================================================
    MAIN DASHBOARD LAYOUT
@@ -19,28 +19,48 @@
     display: flex;
     min-height: 100vh;
     width: 100%;
-    background: #f5f7fc;
+    background: var(--teacher-bg);
 }
 
 /* =========================================================
    LEFT SIDEBAR
    ========================================================= */
+/*
+.dash-shell > .sidebar {
+    width: 237px;
+    min-width: 237px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    border-right: 1px solid #dbe5f5;
+    box-sizing: border-box;
+}
+.dash-shell > .sidebar {
+    background: #eef4ff;
+}
+*/
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
 .dash-shell > .sidebar {
-    width: 220px;
-    min-width: 220px;
+    width: 237px;
+    min-width: 237px;
     height: 100vh;
-
-    position: sticky;
-    top: 0;
 
     display: flex;
     flex-direction: column;
 
-    padding: 16px 14px;
+    padding: 24px 14px 20px;
 
-    background: #ffffff;
-    border-right: 1px solid #edf0f5;
+    background: linear-gradient(
+        180deg,
+        #eef4ff 0%,
+        #f8faff 100%
+    );
+
+    border-right: 1px solid #dbe5f5;
 
     box-sizing: border-box;
 }
@@ -48,33 +68,45 @@
 /* =========================================================
    SIDEBAR LOGO
    ========================================================= */
-
+/*
 .sidebar-logo {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 
-    padding: 0 4px 18px;
-    margin-bottom: 14px;
+    padding: 0 4px;
 
-    border-bottom: 1px solid #f0f2f6;
+    margin-bottom: 28px;
+    border-bottom: none;
+}*/
+.sidebar-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    
+    padding: 0 4px 20px;
+     /* Khoảng cách rõ ràng giữa logo và menu */
+    margin-bottom: 22px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+
 }
-
 .sidebar-logo svg {
-    width: 150px;
-    height: auto;
-    display: block;
+    width: 170px;
+    height: 48px;
+    margin-bottom: px;
+    display:block;
+    
 }
 
 .sidebar-subtitle {
     display: block;
 
-    margin-top: -5px;
-    margin-left: 3px;
+    margin-top: -10px;
+    margin-left: 50px;
 
     color: #7d8797;
 
-    font-size: 7px;
+    font-size: 10px;
     font-weight: 700;
 
     letter-spacing: 0.25px;
@@ -88,9 +120,9 @@
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 5px;
-
-    flex: 1;
+    gap: 3px;
+    min-height: 0;
+    padding-top: 30px;
 }
 
 .sidebar-link {
@@ -107,7 +139,7 @@
 
     box-sizing: border-box;
 
-    border-radius: 8px;
+    border-radius: 10px;
 
     color: #5d687a;
 
@@ -116,12 +148,29 @@
 
     text-decoration: none;
 
-    transition: all 0.2s ease;
+    transition:
+        transform 0.25s ease,
+        background 0.25s ease,
+        color 0.25s ease,
+        box-shadow 0.25s ease;
 }
 
 .sidebar-link:hover {
-    background: #f4f7fc;
+    background: linear-gradient(
+        135deg,
+        #eff6ff,
+        #dbeafe
+    );
+
     color: #2563eb;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 8px 18px rgba(37, 99, 235, 0.18);
+
+    transition:
+        all 0.25s ease;
 }
 
 .sidebar-link--active,
@@ -130,7 +179,7 @@
     color: #2563eb;
     font-weight: 650;
 }
-
+/*
 .sidebar-icon {
     width: 20px;
 
@@ -140,6 +189,19 @@
 
     font-size: 14px;
     flex-shrink: 0;
+}*/
+.sidebar-icon {
+    width: 23px;
+    height: 23px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 17px;
 }
 
 /* =========================================================
@@ -173,52 +235,35 @@
     min-height: 100vh;
     background: var(--teacher-bg);
 }
-/*
 .dash-main {
     flex: 1;
     min-width: 0;
-    padding: 30px 34px 48px;
-    overflow-y: auto;
-}*/
-.dash-main {
-    flex: 1;
-    min-width: 0;
-
     min-height: 100vh;
-
     padding: 28px 32px 48px;
-
     overflow-y: auto;
     box-sizing: border-box;
 }
-
-/* =========================================================
-   WELCOME NAVBAR
-   ========================================================= */
 /* =========================================================
    WELCOME NAVBAR - MODERN
    ========================================================= */
-
 .dash-main .navbar-welcome {
     min-height: 76px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 24px;
-
     margin: -10px -32px 26px;
     padding: 12px 32px;
-
-    background: rgba(255, 255, 255, 0.96);
-
+    /*background: rgba(255, 255, 255, 0.96);*/
     border-bottom: 1px solid #e7edf6;
-
     box-shadow:
         0 4px 18px rgba(15, 23, 42, 0.04);
-
     box-sizing: border-box;
+        background: linear-gradient(
+        135deg,
+        #eef4ff,
+        #dbeafe
+    );
 }
 
 /* ===============================
@@ -229,9 +274,23 @@
     display: flex;
     align-items: baseline;
     gap: 8px;
-
     min-width: 0;
 }
+
+/* ===============================
+   MÀU NỀN SIDEBAR
+================================ */
+.dash-shell > .sidebar {
+    background: linear-gradient(
+        180deg,
+        #eef4ff 0%,
+        #f8faff 100%
+    );
+}
+
+/* ===============================
+   LỜI CHÀO
+================================ */
 
 .dash-main .navbar-greeting {
     color: #7b8799;
@@ -241,6 +300,10 @@
 
     white-space: nowrap;
 }
+
+/* ===============================
+   TÊN NGƯỜI DÙNG
+================================ */
 
 .dash-main .navbar-username {
     color: #172033;
@@ -281,7 +344,7 @@
     border-radius: 11px;
 
     color: #64748b;
-    background: #ffffff;
+    background: var(--teacher-card);
 
     cursor: pointer;
 
@@ -327,20 +390,12 @@
 .dash-main .navbar-avatar {
     width: 40px;
     height: 40px;
-
     margin-left: 5px;
-
     padding: 2px;
-
     border: 1px solid #dbe4f0;
-
     border-radius: 50%;
-
-    background: #ffffff;
-
-    box-shadow:
-        0 4px 12px rgba(15, 23, 42, 0.12);
-
+    background: var(--teacher-card);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
     transition: all 0.2s ease;
 }
 
@@ -361,98 +416,6 @@
 
     border-radius: 50%;
 }
-/*
-.dash-main .navbar-welcome {
-    min-height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    margin: -28px -32px 26px;
-    padding: 12px 32px;
-    border-bottom: 1px solid #e8edf5;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 4px 16px rgba(25, 49, 91, 0.035);
-}
-
-.dash-main .navbar-welcome-text {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    column-gap: 7px;
-    row-gap: 3px;
-}
-
-.dash-main .navbar-greeting {
-    color: #7d8aa1;
-    font-size: 13px;
-    font-weight: 500;
-}
-
-.dash-main .navbar-username {
-    color: #172844;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: -0.15px;
-}
-
-.dash-main .navbar-right {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-
-.dash-main .navbar-icon-btn {
-    position: relative;
-    width: 36px;
-    height: 36px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #e3eaf3;
-    border-radius: 9px;
-    color: #64738c;
-    background: #fff;
-    cursor: pointer;
-    transition: color 160ms ease, border-color 160ms ease, background 160ms ease, transform 160ms ease;
-}
-
-.dash-main .navbar-icon-btn:hover {
-    border-color: #b8cff4;
-    color: #2563eb;
-    background: #f5f8ff;
-    transform: translateY(-1px);
-}
-
-.dash-main .navbar-badge {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 6px;
-    height: 6px;
-    border: 1.5px solid #fff;
-    border-radius: 50%;
-    background: #ef4444;
-}
-
-.dash-main .navbar-avatar {
-    width: 38px;
-    height: 38px;
-    margin-left: 4px;
-    padding: 2px;
-    border: 1px solid #dce6f3;
-    border-radius: 50%;
-    background: #fff;
-    box-shadow: 0 3px 9px rgba(29, 58, 105, 0.1);
-}
-
-.dash-main .navbar-avatar img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    border-radius: 50%;
-    object-fit: cover;
-}*/
 
 /* =========================================================
    HEADER
@@ -718,7 +681,7 @@
     border: 1px solid #e6eaf0;
     border-radius: 6px;
     padding: 5px 8px;
-    background: white;
+    background: #f7f9fd;
     color: var(--teacher-text);
     font-size: 11px;
 }
@@ -887,7 +850,7 @@
    ========================================================= */
 
 .profile-card {
-    background: white;
+    background: var(--teacher-card);
     border: 1px solid var(--teacher-border);
     border-radius: 10px;
     overflow: hidden;
@@ -934,7 +897,7 @@
     border: 1px solid #e5e7eb;
     border-radius: 6px;
     padding: 8px 14px;
-    background: white;
+    background: #f7f9fd;
     color: #64748b;
     font-size: 11px;
     font-weight: 600;
@@ -1088,7 +1051,7 @@
 
 .class-card {
     overflow: hidden;
-    background: white;
+    background: var(--teacher-card);
     border: 1px solid var(--teacher-border);
     border-radius: 10px;
     box-shadow: 0 4px 14px rgba(31, 41, 55, 0.025);
@@ -1179,7 +1142,7 @@
 }
 
 .overview-panel {
-    background: #ffffff;
+    background: var(--teacher-card);
     border: 1px solid #edf0f5;
     border-radius: 10px;
     box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
