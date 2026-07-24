@@ -15,7 +15,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const localToken = localStorage.getItem("token");
+    const sessionToken = sessionStorage.getItem("token");
+    const token = localToken || sessionToken;
 
     if (!token) {
       setLoading(false);
@@ -27,12 +29,15 @@ export const AuthProvider = ({ children }) => {
       .then((data) => {
         const currentUser = data?.user || data;
         setUser(currentUser);
-        localStorage.setItem("user", JSON.stringify(currentUser));
+        const storage = localToken ? localStorage : sessionStorage;
+        storage.setItem("user", JSON.stringify(currentUser));
       })
       .catch((error) => {
         console.log("Get user error:", normalizeAuthError(error));
         localStorage.removeItem("token");
         localStorage.removeItem("user");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("user");
         setUser(null);
       })
       .finally(() => {
@@ -88,6 +93,8 @@ const login = async (email, password, rememberMe = false) => {
     // Xóa dữ liệu đăng nhập
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
 
     // Xóa user trong Context
     setUser(null);
