@@ -10,7 +10,9 @@ const api = axios.create({
 // ✅ Tự động đính kèm token vào mỗi request
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    // Đăng nhập không ghi nhớ dùng sessionStorage, còn ghi nhớ dùng localStorage.
+    // Cả hai trường hợp đều phải gửi token cho các API cần xác thực.
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -33,6 +35,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !isAdminRoute && !isPublicRoute) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/login';
     }
 
