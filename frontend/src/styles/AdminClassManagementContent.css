@@ -37,7 +37,7 @@
 /* Dashboard Grid Layout */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
@@ -47,6 +47,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .column-header {
@@ -202,6 +203,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-width: 0;
 }
 
 .active-class-hero {
@@ -432,6 +434,7 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .table-search-box {
@@ -514,7 +517,21 @@
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  table-layout: fixed;
 }
+
+.students-data-table th:nth-child(1),
+.students-data-table td:nth-child(1) { width: 12%; }
+.students-data-table th:nth-child(2),
+.students-data-table td:nth-child(2) { width: 22%; }
+.students-data-table th:nth-child(3),
+.students-data-table td:nth-child(3) { width: 26%; }
+.students-data-table th:nth-child(4),
+.students-data-table td:nth-child(4) { width: 12%; }
+.students-data-table th:nth-child(5),
+.students-data-table td:nth-child(5) { width: 16%; }
+.students-data-table th:nth-child(6),
+.students-data-table td:nth-child(6) { width: 12%; }
 
 .students-data-table th {
   background-color: #f8fafc;
@@ -545,12 +562,14 @@
   font-size: 13px;
   font-weight: 500;
   color: #64748b;
+  white-space: nowrap;
 }
 
 .student-profile-cell {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .student-avatar-initial {
@@ -576,6 +595,43 @@
   font-size: 14px;
   font-weight: 700;
   color: #0f172a;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.student-email {
+  display: block;
+  overflow: hidden;
+  color: #475569;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-email-button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.student-email-button:hover {
+  color: #004ac6;
+  text-decoration: underline;
+}
+
+.email-details-modal {
+  max-width: 440px;
+}
+
+.full-student-email {
+  overflow-wrap: anywhere;
+  color: #004ac6;
+  font-size: 15px;
 }
 
 .student-dob-cell {
@@ -928,7 +984,7 @@
 }
 
 /* Responsive Breakpoints */
-@media (max-width: 1100px) {
+@media (max-width: 1250px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
