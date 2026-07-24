@@ -25,7 +25,7 @@ const getClasses = async (req, res) => {
     const [classes, total] = await Promise.all([
       Class.find(filter)
         .populate('teacher', 'name email avatar')
-        .populate('students', 'name email avatar')
+        .populate('students', 'name email avatar role status')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limitNum)
@@ -46,7 +46,7 @@ const getClassById = async (req, res) => {
   try {
     const classItem = await Class.findById(req.params.id)
       .populate('teacher', 'name email avatar')
-      .populate('students', 'name email avatar role')
+      .populate('students', 'name email avatar role status')
       .lean();
 
     if (!classItem) return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học' });
@@ -102,7 +102,7 @@ const updateClass = async (req, res) => {
       runValidators: true,
     })
       .populate('teacher', 'name email avatar')
-      .populate('students', 'name email avatar');
+      .populate('students', 'name email avatar role status');
 
     if (!updatedClass) return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học' });
 
@@ -168,7 +168,7 @@ const addStudent = async (req, res) => {
 
     const updatedClass = await Class.findById(req.params.id)
       .populate('teacher', 'name email avatar')
-      .populate('students', 'name email avatar role')
+      .populate('students', 'name email avatar role status')
       .lean();
 
     res.json({ success: true, message: 'Thêm học sinh thành công', class: updatedClass });
@@ -201,7 +201,7 @@ const removeStudent = async (req, res) => {
 
     const updatedClass = await Class.findById(id)
       .populate('teacher', 'name email avatar')
-      .populate('students', 'name email avatar role')
+      .populate('students', 'name email avatar role status')
       .lean();
 
     res.json({ success: true, message: 'Xóa học sinh khỏi lớp thành công', class: updatedClass });
