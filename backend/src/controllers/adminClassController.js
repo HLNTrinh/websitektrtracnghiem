@@ -1,5 +1,6 @@
 const Class = require('../models/Class');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 /* =========================
    GET /api/admin/classes
@@ -137,10 +138,18 @@ const addStudent = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp ID học sinh' });
     }
 
+    if (!mongoose.Types.ObjectId.isValid(studentId)) {
+      return res.status(400).json({ success: false, message: 'ID học sinh không hợp lệ' });
+    }
+
     // Kiểm tra user có tồn tại không
     const student = await User.findById(studentId);
     if (!student) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy học sinh' });
+    }
+
+    if (student.role !== 'student') {
+      return res.status(400).json({ success: false, message: 'Tài khoản được chọn không phải học sinh' });
     }
 
     const classItem = await Class.findById(req.params.id);
@@ -149,7 +158,7 @@ const addStudent = async (req, res) => {
     }
 
     // Kiểm tra học sinh đã có trong lớp chưa
-    if (classItem.students.includes(studentId)) {
+    if (classItem.students.some((id) => id.equals(student._id))) {
       return res.status(400).json({ success: false, message: 'Học sinh đã có trong lớp này' });
     }
 
@@ -181,7 +190,7 @@ const removeStudent = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Không tìm thấy lớp học' });
     }
 
-    const studentIndex = classItem.students.indexOf(studentId);
+    const studentIndex = classItem.students.findIndex((student) => student.equals(studentId));
     if (studentIndex === -1) {
       return res.status(404).json({ success: false, message: 'Học sinh không có trong lớp này' });
     }
